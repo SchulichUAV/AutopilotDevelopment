@@ -1,5 +1,7 @@
 # Connects to the vehicle and tests heartbeat
 
+# Created by: Liam Mah, May 2024
+
 from pymavlink import mavutil
 
 def verify_connection(vehicle_connection):
