@@ -64,5 +64,5 @@ def absolute_movement(vehicle_connection, latitude, longitude, altitude):
         0 # yaw rate: Ignore for now - yaw rate in rad/s
     ))
 
-    waypoint_progress(vehicle_connection) # Comment out if you want to see live updates in Mission Planner
+    # waypoint_progress(vehicle_connection) # Comment out if you want to see live updates in Mission Planner
 
