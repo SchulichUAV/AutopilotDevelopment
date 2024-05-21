@@ -18,7 +18,7 @@ def coordinate_waypoint():
     try:
         latitude = int(data['latitude'])
         longitude = int(data['longitude'])
-        altitude = int(data['altitude'])
+        altitude = 25
     except Exception as e:
         return jsonify({'error': 'Invalid data'}), 400
     
@@ -39,5 +39,5 @@ def hello():
     return ({'message': 'success'}), 200
 
 if __name__ == '__main__':
-    # vehicle_connection = initialize.connect_to_vehicle()
+    vehicle_connection = initialize.connect_to_vehicle()
     app.run(debug=True, host='0.0.0.0')
