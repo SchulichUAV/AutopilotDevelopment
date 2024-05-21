@@ -2,6 +2,8 @@
 # Absolute - Flies to a set of coordinates (latitude, longitude, altitude)
 # Relative - Flies to a set of coordinates relative to the home position [NED - north, east, down]
 
+# Created by: Liam Mah, May 2024
+
 from pymavlink import mavutil
 
 def waypoint_progress(vehicle_connection):

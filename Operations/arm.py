@@ -1,5 +1,7 @@
 # Provides functionality to arm and disarm the vehicle.
 
+# Created by: Liam Mah, May 2024
+
 #TODO: Conduct safety checks with physical vehicle [IMPORTANT!]
 
 from pymavlink import mavutil

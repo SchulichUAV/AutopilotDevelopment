@@ -1,5 +1,7 @@
 # Switches the current flight mode
 
+# Created by: Liam Mah, May 2024
+
 from pymavlink import mavutil
 
 # Some flight mode IDs...
