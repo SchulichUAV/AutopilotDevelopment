@@ -17,8 +17,8 @@ vehicle_connection = None
 def coordinate_waypoint():
     data = request.json
     try:
-        latitude = int(data['latitude'])
-        longitude = int(data['longitude'])
+        latitude = float(data['latitude'])
+        longitude = float(data['longitude'])
         altitude = 25
     except Exception as e:
         return jsonify({'error': 'Invalid data'}), 400
