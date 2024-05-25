@@ -24,6 +24,9 @@ def coordinate_waypoint():
         return jsonify({'error': 'Invalid data'}), 400
     
     waypoint.absolute_movement(vehicle_connection, latitude, longitude, altitude)
+    print(f"latitude {latitude}")
+    print(f"longitude: {longitude}")
+
     
     return jsonify({'message': 'Waypoint set successfully'}), 200
 
@@ -76,8 +79,15 @@ def takeoff():
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         vehicle_port = sys.argv[1]
-    vehicle_connection = initialize.connect_to_vehicle(vehicle_port)
+
+    BAUD = 57600
+    vehicle_port = 'COM6'
+
+    print(f"Attempting to connect to port: {vehicle_port}")
+    vehicle_connection = initialize.connect_to_vehicle(vehicle_port, BAUD)
+    print("Vehicle connection established.")
     retVal = initialize.verify_connection(vehicle_connection)
+    print("Vehicle connection verified.")
     if retVal != True:
         print("Connection failed. Exiting application.")
         exit(1)
