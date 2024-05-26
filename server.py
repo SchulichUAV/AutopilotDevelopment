@@ -88,6 +88,7 @@ if __name__ == '__main__':
     print("Vehicle connection established.")
     retVal = initialize.verify_connection(vehicle_connection)
     print("Vehicle connection verified.")
+    
     if retVal != True:
         print("Connection failed. Exiting application.")
         exit(1)
