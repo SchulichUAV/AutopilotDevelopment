@@ -1,5 +1,10 @@
 from pymavlink import mavutil
 import time
+import os
+import sys
+
+script_dir = os.path.abspath('./../..')
+sys.path.append(script_dir)
 
 import Operations.General.arm as arm
 import Operations.General.initialize as initialize
