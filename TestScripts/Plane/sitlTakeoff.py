@@ -16,6 +16,6 @@ vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0
 
 arm.arm(vehicle_connection)
 time.sleep(1)
-mode.set_mode(vehicle_connection, 13)
+mode.set_mode(vehicle_connection, 19)
 time.sleep(1)
 
