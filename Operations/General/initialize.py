@@ -14,11 +14,12 @@ def verify_connection(vehicle_connection):
         (vehicle_connection.target_system, vehicle_connection.target_component))
     return True
 
-def connect_to_vehicle(port='172.23.192.1:14500'):
+def connect_to_vehicle(port, baudrate):
     # PROMISES: Connection to the vehicle will be established
     # REQUIRES: Vehicle network port
     # Connect to the vehicle
 
-    vehicle_connection = mavutil.mavlink_connection(port)
-    valid_connection = verify_connection(vehicle_connection)   
-    return vehicle_connection, valid_connection
+    vehicle_connection = mavutil.mavlink_connection(port, baud=baudrate)
+    # valid_connection = verify_connection(vehicle_connection)   
+    # return vehicle_connection, valid_connection
+    return vehicle_connection
