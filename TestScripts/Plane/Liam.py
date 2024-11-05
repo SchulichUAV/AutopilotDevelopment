@@ -1,5 +1,5 @@
 from pymavlink import mavutil
-import time
+import time, os, sys
 
 import Operations.General.arm as arm
 import Operations.General.initialize as initialize
@@ -7,7 +7,8 @@ import Operations.General.mode as mode
 import Operations.Copter.takeoff as takeoff
 import Operations.General.waypoint as waypoint
 
-# vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
+script_dir = os.path.abspath('./../..')
+sys.path.append(script_dir)
 
 master = mavutil.mavlink_connection('udpin:127.0.0.1:14550')
 master.wait_heartbeat()
@@ -21,13 +22,13 @@ def arm_and_takeoff(altitude):
         mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
         0,
         1, 0, 0, 0, 0, 0, 0)
-    master.motors_armed_wait()
+    time.sleep(4)
     print("Arming motors")
 
 
-    mode.set_mode(15)
+    mode.set_mode(master, 15)
     print("Set to GUIDED mode")
-    master.wait_mode('GUIDED')
+    time.sleep(4)
 
     
     master.mav.command_long_send(
@@ -63,7 +64,7 @@ def goto_position_target_global_int(aLat, aLon, aAlt):
 
 def return_to_launch():
    
-    mode.set_mode(10)
+    mode.set_mode(master, 10)
     print("Returning to launch")
 
 
