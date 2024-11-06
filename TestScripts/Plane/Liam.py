@@ -1,14 +1,14 @@
 from pymavlink import mavutil
 import time, os, sys
 
+script_dir = os.path.abspath('./../..')
+sys.path.append(script_dir)
+
 import Operations.General.arm as arm
 import Operations.General.initialize as initialize
 import Operations.General.mode as mode
 import Operations.Copter.takeoff as takeoff
 import Operations.General.waypoint as waypoint
-
-script_dir = os.path.abspath('./../..')
-sys.path.append(script_dir)
 
 master = mavutil.mavlink_connection('udpin:127.0.0.1:14550')
 master.wait_heartbeat()
