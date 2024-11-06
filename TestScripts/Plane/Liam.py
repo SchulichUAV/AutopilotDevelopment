@@ -22,13 +22,13 @@ def arm_and_takeoff(altitude):
         mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
         0,
         1, 0, 0, 0, 0, 0, 0)
-    time.sleep(4)
+    time.sleep(3)
     print("Arming motors")
 
 
     mode.set_mode(master, 15)
     print("Set to GUIDED mode")
-    time.sleep(4)
+    time.sleep(3)
 
     
     master.mav.command_long_send(
