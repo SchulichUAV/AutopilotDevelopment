@@ -19,5 +19,5 @@ takeoff_configuration.set_takeoff_angle(vehicle_connection, 20)
 time.sleep(1)
 arm.arm(vehicle_connection)
 time.sleep(1)
-mode.set_mode(13)
+mode.set_mode(vehicle_connection, 13)
 
