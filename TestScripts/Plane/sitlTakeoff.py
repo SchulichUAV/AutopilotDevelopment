@@ -14,9 +14,9 @@ import Operations.Plane.takeoffConfiguration as takeoff_configuration
 
 vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
 
-arm.arm(vehicle_connection)
+takeoff_configuration.set_takeoff_altitude(vehicle_connection, 100)
 time.sleep(1)
-takeoff_configuration.set_takeoff_altitude(vehicle_connection, 30)
+arm.arm(vehicle_connection)
 time.sleep(1)
 mode.set_mode(13)
 
