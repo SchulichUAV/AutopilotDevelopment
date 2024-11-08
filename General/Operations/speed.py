@@ -42,9 +42,5 @@ def set_airspeed_cruise(vehicle_connection, speed, throttle=-1):
         0, # Param 5 - Unused, set to zero to populate all 7 parameters
         0, # Param 6 - Unused, set to zero to populate all 7 parameters
         0 # Param 7 - Unused, set to zero to populate all 7 parameters
-        mavutil.mavlink.MAV_PARAM_TYPE_UINT32
     )
     print(vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True))
-    message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
-    print('name: %s\tvalue: %d' %
-        (message['param_id'], message['param_value']))
