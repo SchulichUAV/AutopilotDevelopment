@@ -28,5 +28,6 @@ time.sleep(20)
 <<<<<<< HEAD
 speed.set_airspeed_cruise(vehicle_connection, 60)
 =======
-speed.change_speed(vehicle_connection, 100)
->>>>>>> be6aaa77479cba0f10eb8d51ce06b27af86957b4
+#speed.change_speed(vehicle_connection, 100)
+#>>>>>>> be6aaa77479cba0f10eb8d51ce06b27af86957b4
+
