@@ -25,4 +25,4 @@ mode.set_mode(vehicle_connection, 13)
 time.sleep(20)
 
 #vehicle_connection, speed, throttle=-1
-speed.change_speed(vehicle_connection, 100)
+speed.set_airspeed_cruise(vehicle_connection, 60)
