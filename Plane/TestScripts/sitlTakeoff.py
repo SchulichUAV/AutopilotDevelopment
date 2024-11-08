@@ -6,9 +6,9 @@ import os
 script_dir = os.path.abspath('./../..')
 sys.path.append(script_dir)
 
-import Operations.General.arm as arm
-import Operations.General.initialize as initialize
-import Operations.General.mode as mode
+import General.Operations.arm as arm
+import General.Operations.initialize as initialize
+import General.Operations.mode as mode
 
 import Plane.Operations.takeoffConfiguration as takeoff_configuration
 
