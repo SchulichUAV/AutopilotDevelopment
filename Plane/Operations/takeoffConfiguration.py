@@ -17,7 +17,7 @@ def set_takeoff_altitude(vehicle_connection, takeoff_height):
 
     message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
     print('name: %s\tvalue: %d' %
-        (message['param_id'].decode("utf-8"), message['param_value']))
+        (message['param_id'], message['param_value']))
 
 def set_takeoff_angle(vehicle_connection, takeoff_pitch_angle):
     # PROMISES: Sets fixed-wing vehicle takeoff pitch angle configuration
@@ -25,12 +25,12 @@ def set_takeoff_angle(vehicle_connection, takeoff_pitch_angle):
     vehicle_connection.mav.param_set_send(
         vehicle_connection.target_system,
         vehicle_connection.target_component,
-        b'TKOFF_ALT',
+        b'TKOFF_LVL_PITCH',
         takeoff_pitch_angle,
         mavutil.mavlink.MAV_PARAM_TYPE_UINT32
     )
 
     message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
     print('name: %s\tvalue: %d' %
-        (message['param_id'].decode("utf-8"), message['param_value']))
+        (message['param_id'], message['param_value']))
     
