@@ -26,3 +26,18 @@ def change_speed(vehicle_connection, speed, throttle=-1):
 
     msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print ACK to confirm successful execution
     print(msg)
+
+def set_speed(vehicle_connection, speed):
+    # PROMISES: Sets fixed-wing vehicle target cruise speed configuration
+    # REQUIRES: Vehicle connection, the desired cruise speed
+    vehicle_connection.mav.param_set_send(
+        vehicle_connection.target_system,
+        vehicle_connection.target_component,
+        b'AIRSPEED_CRUISE',
+        speed,
+        mavutil.mavlink.MAV_PARAM_TYPE_UINT32
+    )
+
+    message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+    print('name: %s\tvalue: %d' %
+        (message['param_id'], message['param_value']))
