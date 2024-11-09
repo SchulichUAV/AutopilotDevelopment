@@ -19,9 +19,9 @@ vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0
 ground_speed = 30 # [m/s]
 loiter_radius = 20 # [m]
 loiter_direction = 0 # 0: CW, 1: CCW
-latitude: 0
-longitude: 0
-altitude: 100
+latitude = 123.4567891
+longitude = 123.4567891
+altitude = 100
 
 takeoff_configuration.set_takeoff_altitude(vehicle_connection, 10)
 takeoff_configuration.set_takeoff_angle(vehicle_connection, 20)
@@ -29,7 +29,9 @@ time.sleep(1)
 arm.arm(vehicle_connection)
 time.sleep(1)
 mode.set_mode(vehicle_connection, 13)
-time.sleep(5)
+time.sleep(10)
+mode.set_mode(vehicle_connection, 15)
+time.sleep(1)
 waypoint.reposition(vehicle_connection, ground_speed, loiter_radius, loiter_direction, latitude, longitude, altitude)
 
 
