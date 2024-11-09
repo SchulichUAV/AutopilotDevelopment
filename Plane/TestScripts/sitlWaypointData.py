@@ -13,6 +13,9 @@ import General.Operations.mode as mode
 import Plane.Operations.takeoffConfiguration as takeoff_configuration
 
 vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
-
+#for i in range(20):
 msg = vehicle_connection.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True) # Print command ACK to confirm successful execution
+speeds = vehicle_connection.recv_match(type='LOCAL_POSITION_NED', blocking=True)
+
 print(msg)
+#time.sleep(0.5)
