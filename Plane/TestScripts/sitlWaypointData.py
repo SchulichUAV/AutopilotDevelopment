@@ -13,9 +13,24 @@ import General.Operations.mode as mode
 import Plane.Operations.takeoffConfiguration as takeoff_configuration
 
 vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
-#for i in range(20):
-msg = vehicle_connection.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True) # Print command ACK to confirm successful execution
-speeds = vehicle_connection.recv_match(type='LOCAL_POSITION_NED', blocking=True)
 
-print(msg)
-#time.sleep(0.5)
+def recieve_wp(vehicle_con):
+    '''
+    PROMISES: Returns data about the current target waypoint
+    REQUIRES: vehicle_con recieves the vehicle connection as an input
+    '''
+    return vehicle_con.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True)
+
+
+def recieve_speeds(vehicle_con):
+    '''
+    PROMISES: Returns a list of the x, y, and z speeds of the aircraft
+    REQUIRES: vehicle_con recieves the vehicle connection as an input
+    '''
+    speed_data = vehicle_con.recv_match(type='LOCAL_POSITION_NED', blocking=True)
+
+    return [speed_data.vx, speed_data.vy, speed_data.vz]
+
+def waypoint_ETA():
+    pass
+print(recieve_wp(vehicle_connection))
