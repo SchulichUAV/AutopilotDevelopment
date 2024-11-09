@@ -24,10 +24,9 @@ def recieve_wp(vehicle_con):
 
 def recieve_speeds(vehicle_con):
     '''
-    PROMISES: Returns a list of the x, y, and z speeds of the aircraft
+    PROMISES: Returns data about the airspeed, groundspeed, throttle, etc.
     REQUIRES: vehicle_con recieves the vehicle connection as an input
     '''
-    #speed_data = vehicle_con.recv_match(type='LOCAL_POSITION_NED', blocking=True)
     speed_data = vehicle_con.recv_match(type='VFR_HUD', blocking=True)
     return speed_data
 
@@ -36,8 +35,8 @@ def waypoint_ETA(vehicle_con):
     PROMISES: Returns the estimated time (in seconds) until the current target waypoint is reached
     REQUIRES: vehicle_con recieves the vehicle connection as an input
     '''
-    wp_distace = recieve_wp(vehicle_con).wp_dist
-    airspeed = recieve_speeds(vehicle_con).airspeed
+    wp_distace = recieve_wp(vehicle_con).wp_dist # find the distance to the target waypoint
+    airspeed = recieve_speeds(vehicle_con).airspeed # find the current airspeed
 
-    wp_ETA = wp_distace / airspeed
+    wp_ETA = wp_distace / airspeed #calculate the ETA until the waypoint is reached
     return wp_ETA
