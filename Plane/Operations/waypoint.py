@@ -10,8 +10,10 @@ def reposition(vehicle_connection, ground_speed, loiter_radius, loiter_direction
     vehicle_connection.mav.send(vehicle_connection.mav.command_int_send( # Specify COMMAND_LONG
         vehicle_connection.target_system, # Specify target system
         vehicle_connection.target_component, # Specify target component
+        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, # Coordinate frame
         mavutil.mavlink.MAV_CMD_DO_REPOSITION, # Command ID (or enum of command) - Set mode command
-        0, # Confirmation - 0: First transmission of this cmd, 1-255: Confirmation transmissions (e.g. kill)
+        0, # current (unused)
+        0, # autocontinue (unused)
         ground_speed, 
         1, # Param 2 - 0: Don't put into guided automatically, 1: put into guided automatically 
         loiter_radius,
