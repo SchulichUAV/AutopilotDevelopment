@@ -35,8 +35,8 @@ def waypoint_ETA(vehicle_con):
     PROMISES: Returns the estimated time (in seconds) until the current target waypoint is reached
     REQUIRES: vehicle_con recieves the vehicle connection as an input
     '''
-    wp_distace = recieve_wp(vehicle_con).wp_dist # find the distance to the target waypoint
+    wp_distance = recieve_wp(vehicle_con).wp_dist # find the distance to the target waypoint
     airspeed = recieve_speeds(vehicle_con).airspeed # find the current airspeed
 
-    wp_ETA = wp_distace / airspeed #calculate the ETA until the waypoint is reached
+    wp_ETA = wp_distance / airspeed #calculate the ETA until the waypoint is reached
     return wp_ETA
