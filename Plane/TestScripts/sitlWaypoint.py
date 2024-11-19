@@ -24,7 +24,7 @@ mode.set_mode(vehicle_connection, 13)
 
 time.sleep(15)
 
-waypoint.set_waypoint(vehicle_connection, 114.234123, 120.123421, 100)
+waypoint.set_waypoint(vehicle_connection, 51.100000, 2.000000, 100)
 time.sleep(1)
-mode.set_mode(10)
+mode.set_mode(vehicle_connection, 10)
 
