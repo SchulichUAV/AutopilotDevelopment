@@ -23,7 +23,20 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude):
         0,  # parameter 2 (acceptance radius in meters)
         0,  # parameter 3 (pass radius in meters)
         0,  # parameter 4 (yaw angle)
-        int(latitude * 1e7) # latitude (WGS84)
+        int(latitude * 1e7), # latitude (WGS84)
         int(longitude * 1e7), # longitude (WGS84)
         altitude  # Altitude in meters
     ))
+
+    start_time = time.time()
+    timeout = 5  # seconds
+    while time.time() - start_time < timeout:
+        # Fetch messages from the vehicle
+        message = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=1)
+        if message:
+            if message.type == 0:  # MAV_MISSION_ACCEPTED
+                print("Waypoint successfully set.")
+            else:
+                print(f"Waypoint setting failed: {message.type}")
+
+    print("Timeout waiting for acknowledgment.")
