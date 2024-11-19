@@ -13,7 +13,7 @@ import Plane.Operations.waypoint as waypoint
 
 import Plane.Operations.takeoffConfiguration as takeoff_configuration
 
-vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
+vehicle_connection, valid_connection = initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
 
 takeoff_configuration.set_takeoff_altitude(vehicle_connection, 100)
 takeoff_configuration.set_takeoff_angle(vehicle_connection, 20)

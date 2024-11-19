@@ -48,7 +48,14 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude):
     print("Timeout waiting for acknowledgment.")
 
     vehicle_connection.mav.mission_count_send(
-            vehicle_connection.target_system,
-            vehicle_connection.target_component,
-            1
+        vehicle_connection.target_system,
+        vehicle_connection.target_component,
+        1
     )
+
+    time.sleep(1)
+
+    print("Starting mission")
+    vehicle_connection.mav.command_long_send(vehicle_connection.target_system, vehicle_connection.target_component, 
+                                             mavutil.mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0)
+
