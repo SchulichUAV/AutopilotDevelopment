@@ -22,4 +22,11 @@ arm.arm(vehicle_connection)
 time.sleep(1)
 mode.set_mode(vehicle_connection, 13)
 
+'''
+     implementation here
+     on my machine, calling this function returns:
+     CONDITION_CHANGE_ALT: UNSUPPORTED
+     pls take a look on your machines ? 
+'''
+
 altitude.set_current_altitude(vehicle_connection, 300)
