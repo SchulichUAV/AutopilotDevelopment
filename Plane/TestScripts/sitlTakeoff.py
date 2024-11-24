@@ -29,4 +29,5 @@ mode.set_mode(vehicle_connection, 13)
      pls take a look on your machines ? 
 '''
 
-altitude.set_current_altitude(vehicle_connection, 300)
+#altitude.set_current_altitude(vehicle_connection, 300)
+#altitude.get_current_altitude(vehicle_connection)
