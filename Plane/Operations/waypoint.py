@@ -7,8 +7,11 @@ def try_mav_reposition(vehicle_connection, latitude, longitude, altitude):
     vehicle_connection.mav.command_int_send(
         vehicle_connection.target_system,
         vehicle_connection.target_component,
+        dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT,
         mavutil.mavlink.MAV_CMD_DO_REPOSITION,
-        -1, # -1 for default speed
+        0, # current (Not used)
+        0, # autocontinue (Not used)
+        -1, # param 1: -1 for default speed
         dialect.SPEED_TYPE_AIRSPEED,
         30, # Random 30m loiter radius for planes
         0, # Loiter CW
