@@ -27,5 +27,5 @@ def set_mode(vehicle_connection, mode_id):
         0 # Param 7 - Unused, set to zero to populate all 7 parameters
     )
 
-    msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True) 
+    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) 
     print(msg)

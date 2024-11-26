@@ -22,5 +22,5 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude):
         altitude
     ))
 
-    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print command ACK to confirm successful execution
+    msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True)
     print(msg)

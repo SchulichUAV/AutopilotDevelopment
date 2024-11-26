@@ -25,4 +25,4 @@ mode.set_mode(vehicle_connection, 13)
 time.sleep(15)
 
 mode.set_mode(vehicle_connection, 15)
-waypoint.set_waypont(vehicle_connection, 51.100000, 2.000000, 100)
+waypoint.set_waypoint(vehicle_connection, 51.100000, 2.000000, 100)
