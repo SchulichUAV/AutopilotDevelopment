@@ -3,73 +3,24 @@ import pymavlink.dialects.v20.all as dialect
 import time
 import math
 
-def try_mav_reposition(vehicle_connection, latitude, longitude, altitude):
-    vehicle_connection.mav.command_int_send(
-        vehicle_connection.target_system,
-        vehicle_connection.target_component,
-        dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT,
-        mavutil.mavlink.MAV_CMD_DO_REPOSITION,
-        0, # current (Not used)
-        0, # autocontinue (Not used)
-        -1, # param 1: -1 for default speed
-        dialect.SPEED_TYPE_AIRSPEED,
-        30, # Random 30m loiter radius for planes
-        0, # Loiter CW
-        int(latitude * 1e7), # latitude (WGS84)
-        int(longitude * 1e7), # longitude (WGS84)
-        altitude  # Altitude in meters
-    )
-
-    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print command ACK to confirm successful execution
-    print(msg)
-
 def set_waypoint(vehicle_connection, latitude, longitude, altitude):
-    # PROMISES: 
-    # REQUIRES: 
-    vehicle_connection.mav.mission_count_send(
-            vehicle_connection.target_system,
-            vehicle_connection.target_component,
-            1, # Let's try to only do a single waypoint for now
-            dialect.MAV_MISSION_TYPE_MISSION,
-            10 # Some random number for testing purposes for now, seems to only be ID of current mission (used on download)
-    )
-
-    time.sleep(1)
-
+    # Create target location message
     vehicle_connection.mav.send(dialect.MAVLink_mission_item_int_message(
         vehicle_connection.target_system,
         vehicle_connection.target_component,
-        0,  # Waypoint number (0, 1, 2, ...)
-        3,  # MAV_FRAME_GLOBAL_RELATIVE_ALT (WGS84 altitude relative to home position)
-        dialect.MAV_CMD_NAV_WAYPOINT,  # Specify mission item int message
-        1,  # Tried using current = 2 here to indicate guided mode "goto" message: https://ardupilot.org/dev/docs/plane-commands-in-guided-mode.html
-        1,  # autocontinue to next point (1 to enable, 0 to disable)
-        0,  # parameter 1 (hold time in seconds)
-        0,  # parameter 2 (acceptance radius in meters)
-        0,  # parameter 3 (pass radius in meters)
-        0,  # parameter 4 (yaw angle)
-        int(latitude * 1e7), # latitude (WGS84)
-        int(longitude * 1e7), # longitude (WGS84)
-        altitude  # Altitude in meters
+        0, # Sequence number
+        dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
+        dialect.MAV_CMD_NAV_WAYPOINT,
+        2, # Current can be 2 to work in guided mode
+        0, # Autocontinue (do not continue to next waypoint)
+        0, # Hold time at waypoint for rotor, ignored by fixed wing
+        0, # Acceptance radius for waypoint
+        0, # Pass radius
+        0, # Yaw
+        int(latitude * 1e7),
+        int(longitude * 1e7),
+        altitude
     ))
 
-    start_time = time.time()
-    timeout = 5  # seconds
-    while time.time() - start_time < timeout:
-        # Fetch messages from the vehicle
-        message = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=1)
-        if message:
-            if message.type == 0:  # MAV_MISSION_ACCEPTED
-                print("Waypoint successfully set.")
-                return
-            else:
-                print(f"Waypoint setting failed: {message.type}")
-                return
-    print("Timeout waiting for acknowledgment.")
-
-    time.sleep(1)
-
-    vehicle_connection.mav.command_long_send(vehicle_connection.target_system, vehicle_connection.target_component, 
-                                             mavutil.mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0)
-    print("Starting mission")
-
+    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print command ACK to confirm successful execution
+    print(msg)
