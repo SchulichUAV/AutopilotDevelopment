@@ -39,6 +39,12 @@ def receive_gps_raw(vehicle_connection):
     # REQUIRES: Vehicle connection
     return vehicle_connection.recv_match(type='GPS_RAW_INT', blocking='True')
 
+def receive_utm_global_position(vehicle_connection):
+    return vehicle_connection.recv_match(type='UTM_GLOBAL_POSITION', blocking='True')
+
+def receive_wind_cov(vehicle_connection):
+    return vehicle_connection.recv_match(type='WIND_COV', blocking='True')
+
 # def receive_gps_status(vehicle_connection):
 #     # PROMISES:
 #     # REQUIRES:
