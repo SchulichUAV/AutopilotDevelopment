@@ -13,7 +13,6 @@ import General.Operations.waypoint_computation as waypoint_computation
 import Plane.Operations.systemState as systemState ## not fully configured, needs to be checked with a gps
 import Plane.Operations.takeoffConfiguration as takeoff_config
 import Plane.Operations.waypoint as waypoint
-import Plane.Operations.waypointConfiguration as waypoint_config
 
 class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
