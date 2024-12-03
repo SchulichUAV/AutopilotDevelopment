@@ -8,7 +8,7 @@ sys.path.append(script_dir)
 
 
 import General.Operations.initialize as initialize
-import Plane.Operations.systemState as system_state
+import Plane.Operations.system_state as system_state
 
 vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
 

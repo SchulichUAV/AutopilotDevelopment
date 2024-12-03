@@ -8,9 +8,9 @@ import General.Operations.arm as arm
 import General.Operations.initialize as initialize
 import General.Operations.mode as mode
 import General.Operations.speed as speed
-import General.Operations.waypoint_computation as waypoint_computation
+import General.Operations.monitor_waypoint as monitor_waypoint
 
-import Plane.Operations.systemState as systemState ## not fully configured, needs to be checked with a gps
+import Plane.Operations.system_state as system_state ## not fully configured, needs to be checked with a gps
 import Plane.Operations.takeoff as takeoff_config
 import Plane.Operations.waypoint as waypoint
 
