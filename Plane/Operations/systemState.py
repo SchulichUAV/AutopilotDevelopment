@@ -8,14 +8,15 @@ def receive_system_status(vehicle_connection):
     return vehicle_connection.recv_match(type='SYS_STATUS', blocking='True')
 
 def receive_param_request_read(vehicle_connection, param_id):
-    param_id_bytes = param_id.encode('utf-8')
     # PROMISES: Retreives value of parameter thats passed in
     # REQUIRES: Vehicle connection, the desired parameter thats passed in
+    param_id_bytes = param_id.encode('utf-8')
+    
     vehicle_connection.mav.param_request_read_send(
-        vehicle_connection.target_system,
-        vehicle_connection.target_component,
-        param_id_bytes,
-        -1,
+        target_system=vehicle_connection.target_system,
+        target_component=vehicle_connection.target_component,
+        param_id=param_id_bytes,
+        param_index=-1, # -1 to use param ID field as identifier
     )
 
     while True:
@@ -48,4 +49,3 @@ def receive_gps_raw(vehicle_connection):
 #     # PROMISES:
 #     # REQUIRES:
 #     vehicle_connection.recv_match(type='SCALED_IMU', blocking='True')
-

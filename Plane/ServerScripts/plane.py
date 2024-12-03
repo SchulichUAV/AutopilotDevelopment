@@ -11,7 +11,7 @@ import General.Operations.speed as speed
 import General.Operations.waypoint_computation as waypoint_computation
 
 import Plane.Operations.systemState as systemState ## not fully configured, needs to be checked with a gps
-import Plane.Operations.takeoffConfiguration as takeoff_config
+import Plane.Operations.takeoff as takeoff_config
 import Plane.Operations.waypoint as waypoint
 
 class Plane:

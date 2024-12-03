@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins" : "*"}}) # Overriding CORS for external a
 vehicle_connection = None
 
 if __name__ == '__main__':
-    if len(sus.argvv) == 2:
+    if len(sys.argvv) == 2:
         vehicle_port = sys.argv[1]
 
         BAUD = 57600
