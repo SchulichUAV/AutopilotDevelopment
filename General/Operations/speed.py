@@ -39,6 +39,7 @@ def check_valid_speed(speed):
     if(speed < min_speed):
         print("ERROR: requested speed below the minimum allowed speed")
         return 0
+    return 1
 
 
 def change_speed(vehicle_connection, speed, throttle=-1):
