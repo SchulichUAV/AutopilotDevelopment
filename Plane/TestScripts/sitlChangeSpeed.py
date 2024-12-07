@@ -24,6 +24,9 @@ mode.set_mode(vehicle_connection, 13)
 
 time.sleep(20)
 
-speed.set_cruise_speed(vehicle_connection, 15)
+while(1):
+    test_speed = float(input("Enter the speed (km/h): "))
+    test_speed = test_speed / 3.6
+    speed.set_cruise_speed(vehicle_connection, test_speed)
 
 
