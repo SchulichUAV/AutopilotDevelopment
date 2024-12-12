@@ -15,6 +15,8 @@ import Plane.Operations.takeoffConfiguration as takeoff_configuration
 
 vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
 
+#some testing scripts (used in guided mode atm)
+
 mode.set_mode(vehicle_connection, 7)
 altitude.set_current_altitude(vehicle_connection, 300)
 altitude.get_current_altitude(vehicle_connection)
