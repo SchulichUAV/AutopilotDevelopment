@@ -15,13 +15,10 @@ import Plane.Operations.takeoffConfiguration as takeoff_configuration
 
 vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
 
-takeoff_configuration.set_takeoff_altitude(vehicle_connection, 100)
-takeoff_configuration.set_takeoff_angle(vehicle_connection, 20)
-time.sleep(1)
-arm.arm(vehicle_connection)
-time.sleep(1)
-mode.set_mode(vehicle_connection, 13)
+#some testing scripts (used in guided mode atm)
 
-# example usage
-#altitude.set_current_altitude(vehicle_connection, 300)
-#altitude.get_current_altitude(vehicle_connection)
+mode.set_mode(vehicle_connection, 7)
+altitude.set_current_altitude(vehicle_connection, 300)
+altitude.get_current_altitude(vehicle_connection)
+time.sleep(20)
+altitude.get_current_altitude(vehicle_connection)
