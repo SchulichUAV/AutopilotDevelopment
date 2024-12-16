@@ -26,6 +26,12 @@ class suav_location(mp_module.MPModule):
         self.dalt = 0
         self.heading = 0
 
+        self.num_satellites = 0
+        self.position_uncertainty = 0
+        self.alt_uncertainty = 0
+        self.speed_uncertainty = 0
+        self.heading_uncertainty = 0
+
     def idle_task(self):
         '''called rapidly by mavproxy'''
         now = time.time()
@@ -33,8 +39,6 @@ class suav_location(mp_module.MPModule):
             self.last_emitted = now
 
             if self.lat != 0:
-                #print("Current GPS Position: Lat={}, Lon={}, Relative Alt={}m".format(self.lat, self.lon, self.rel_alt))
-                #print("Current Attitude: Roll={}, Pitch={}, Yaw={}".format(self.roll, self.pitch, self.yaw))
                 self.send_data()
 
     def mavlink_packet(self, m):
@@ -42,20 +46,29 @@ class suav_location(mp_module.MPModule):
         if self.settings.target_system == 0 or self.settings.target_system == m.get_srcSystem():
             if m.get_type() == 'GLOBAL_POSITION_INT':
                 (lat, lon, alt, relative_alt, dlat, dlon, dalt, heading) = (m.lat*1.0e-7, m.lon*1.0e-7, m.alt/1000,
-                                                                            m.relative_alt/1000, m.vx/100, m.vy/100, m.vz/100, m.hdg/100)
-                self.lat = lat
-                self.lon = lon
-                self.alt = alt
-                self.rel_alt = relative_alt
-                self.dlat = dlat
-                self.dlon = dlon
-                self.dalt = dalt
-                self.heading = heading
+                                                                                    m.relative_alt/1000, m.vx/100, m.vy/100, m.vz/100, m.hdg/100)
+                self.lat = lat # Latitude
+                self.lon = lon # Longitude
+                self.alt = alt # Altitude (MSL)
+                self.rel_alt = relative_alt # Altitude above home
+                self.dlat = dlat # Ground X speed (Latitude, positive north)
+                self.dlon = dlon # Ground y Speed (Longitude, positive east)
+                self.dalt = dalt # Ground Z speed (Altitude, postive down)
+                self.heading = heading # Vehicle heading, yaw angle
             elif m.get_type() == 'ATTITUDE':
                 (roll, pitch, yaw) = (m.roll, m.pitch, m.yaw)
-                self.roll = roll
-                self.pitch = pitch
-                self.yaw = yaw
+                self.roll = roll # Roll (-pi, pi)
+                self.pitch = pitch # Pitch (-pi, pi)
+                self.yaw = yaw # Yaw (-pi, pi)
+            elif m.get_type() == 'GPS_RAW_INT':
+                (num_satellites, position_uncertainty, alt_uncertainty, speed_uncertainty, heading_uncertainty) = (m.satellites_visible, 
+                                                                                                                        m.h_acc, m.v_acc, m.vel_acc, m.hdg_acc)
+                self.num_satellites = num_satellites # Number of visible satellites
+                self.position_uncertainty = position_uncertainty # Position uncertainty (mm)
+                self.alt_uncertainty = alt_uncertainty # Altitude uncertainty (mm)
+                self.speed_uncertainty = speed_uncertainty # Speed uncertainty (mm)
+                self.heading_uncertainty = heading_uncertainty # Heading uncertainty (mm)
+            
 
     def send_data(self):
         t = time.time()
@@ -63,10 +76,6 @@ class suav_location(mp_module.MPModule):
         image_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading)
         image_message = f"{image_data}".encode()
         self.sock.sendto(image_message, ("127.0.0.1", 5005))
-
-        # send to 5007 for drop system
-        # items = [self.lon, self.lat, self.rel_alt, self.dlat, self.dlon, self.dalt, self.heading, t]
-        # self.sock.sendto(self.encode_message(items), ("127.0.0.1", 5007))
 
     def encode_message(self, items):
         message = ""
