@@ -3,10 +3,10 @@ import time
 
 from MAVProxy.modules.lib import mp_module
 
-class suav_location(mp_module.MPModule):
+class suav_heartbeat(mp_module.MPModule):
     def __init__(self, mpstate):
         """Initialise module"""
-        super(suav_location, self).__init__(mpstate, "suav_location", "SUAV location extraction")
+        super(suav_heartbeat, self).__init__(mpstate, "suav_heartbeat", "SUAV information extraction")
         self.emit_interval = 0.1
         self.last_emitted = time.time()
         self.sock = socket.socket(socket.AF_INET, # Internet
@@ -72,10 +72,10 @@ class suav_location(mp_module.MPModule):
 
     def send_data(self):
         t = time.time()
-        # send to 5005 for image labeller
-        image_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading)
-        image_message = f"{image_data}".encode()
-        self.sock.sendto(image_message, ("127.0.0.1", 5005))
+        heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
+                        self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty)
+        heartbeat_message = f"{heartbeat_data}".encode()
+        self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
 
     def encode_message(self, items):
         message = ""
@@ -87,4 +87,4 @@ class suav_location(mp_module.MPModule):
 
 def init(mpstate):
     '''initialise module'''
-    return suav_location(mpstate)
+    return suav_heartbeat(mpstate)
