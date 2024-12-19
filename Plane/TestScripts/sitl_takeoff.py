@@ -9,6 +9,7 @@ sys.path.append(script_dir)
 import General.Operations.arm as arm
 import General.Operations.initialize as initialize
 import General.Operations.mode as mode
+import General.Operations.altitude as altitude
 
 import Plane.Operations.takeoff as takeoff_configuration
 
@@ -21,3 +22,6 @@ arm.arm(vehicle_connection)
 time.sleep(1)
 mode.set_mode(vehicle_connection, 13)
 
+# example usage
+#altitude.set_current_altitude(vehicle_connection, 300)
+#altitude.get_current_altitude(vehicle_connection)
