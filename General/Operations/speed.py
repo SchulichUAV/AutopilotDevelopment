@@ -30,23 +30,23 @@ vehicle_connection.mav.param_set_send(
     )
 
 def check_valid_speed(speed):
-    #PROMISES: Returns 0 if the speed value is not between the max and min values
+    #PROMISES: Returns 1 if the speed value is not between the max and min values
     #REQUIRES: "speed" is a positive, real number
     
     if(speed > max_speed):
         print("ERROR: requested speed above maximum allowed speed")
-        return 0
+        return 1
     if(speed < min_speed):
         print("ERROR: requested speed below the minimum allowed speed")
-        return 0
-    return 1
+        return 1
+    return 0
 
 
 def change_speed(vehicle_connection, speed, throttle=-1):
     # PROMISES: The vehicle's speed can be dynamically changed
     # REQUIRES: Vehicle connection, and speed
 
-    if(check_valid_speed(speed) == 0): #if speed is invalid, exit function
+    if(check_valid_speed(speed) == 1): #if speed is invalid, exit function
         return
 
     vehicle_connection.mav.command_long_send( # Specify COMMAND_LONG
@@ -70,7 +70,7 @@ def set_cruise_speed(vehicle_connection, speed):
     # PROMISES: Sets fixed-wing vehicle speed in m/s
     # REQUIRES: Vehicle connection, the desired vehicle speed
 
-    if(check_valid_speed(speed) == 0): #if speed is invalid, exit function
+    if(check_valid_speed(speed) == 1): #if speed is invalid, exit function
         return
 
     vehicle_connection.mav.param_set_send(
