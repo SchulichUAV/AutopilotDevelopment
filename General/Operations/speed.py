@@ -14,19 +14,19 @@ max_speed = 55 / 3.6 # 55 km/h converted to m/s
 min_speed = 40 / 3.6 # 40 km/h converted to m/s
 
 vehicle_connection.mav.param_set_send(
-        vehicle_connection.target_system,
-        vehicle_connection.target_component,
-        b'AIRSPEED_MAX',
-        max_speed,
-        mavutil.mavlink.MAV_PARAM_TYPE_UINT32
+        vehicle_system=vehicle_connection.target_system,
+        target_component=vehicle_connection.target_component,
+        param_id=b'AIRSPEED_MAX',
+        max_speed=max_speed,
+        param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
     )
 
 vehicle_connection.mav.param_set_send(
-        vehicle_connection.target_system,
-        vehicle_connection.target_component,
-        b'AIRSPEED_MIN',
-        min_speed,
-        mavutil.mavlink.MAV_PARAM_TYPE_UINT32
+        vehicle_system=vehicle_connection.target_system,
+        target_component=vehicle_connection.target_component,
+        param_id=b'AIRSPEED_MIN',
+        min_speed=min_speed,
+        param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
     )
 
 def check_valid_speed(speed):
