@@ -179,3 +179,6 @@ vehicle_connection (properties) to document later
     - target_system
     - target_component
 
+we're gonna have to make the FROM_LIST items into parameter or command lists
+or at least provide like a link to the lists
+
