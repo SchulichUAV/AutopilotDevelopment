@@ -82,7 +82,7 @@ def set_waypoint_loiter_radius(vehicle_connection, loiter_radius):
     print('name: %s\tvalue: %d' %
         (received_message['param_id'], received_message['param_value']))
 
-def set_waypoint_loiter_radius(vehicle_connection, rtl_loiter_radius):
+def set_waypoint_rtl_loiter_radius(vehicle_connection, rtl_loiter_radius):
     # PROMISES: Sets fixed-wing vehicle waypoint RTL loiter radius configuration
     # REQUIRES: Vehicle connection, the desired waypoint RTL loiter radius [m]
 
