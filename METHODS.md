@@ -1,5 +1,7 @@
 # Methods and Properties
 
+> by: oscar
+
 - [vehicle_connection.mav methods](#)
   - [.param_set_send()](#.param_set_send())
   - [.send()](#.send())
