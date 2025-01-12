@@ -57,10 +57,10 @@ def change_speed(vehicle_connection, speed, throttle=-1):
         speed_type=mavutil.mavlink.SPEED_TYPE_GROUNDSPEED, # Param 1 - setting speed type
         speed=speed, # Param 2 - speed in m/s
         throttle=throttle, # Param 3 - throttle in percent
-        _unused=0, # Param 4 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 5 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 6 - Unused, set to zero to populate all 7 parameters
-        _unused=0 # Param 7 - Unused, set to zero to populate all 7 parameters
+        _unused_1=0, # Param 4 - Unused, set to zero to populate all 7 parameters
+        _unused_2=0, # Param 5 - Unused, set to zero to populate all 7 parameters
+        _unused_3=0, # Param 6 - Unused, set to zero to populate all 7 parameters
+        _unused_4=0 # Param 7 - Unused, set to zero to populate all 7 parameters
     )
 
     msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print ACK to confirm successful execution

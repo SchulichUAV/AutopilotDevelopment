@@ -17,11 +17,11 @@ def arm(vehicle_connection):
         confirmation=0, # Confirmation - 0: First transmission of this cmd, 1-255: Confirmation transmissions (e.g. kill)
         arm=1, # Param 1 - Arm/Disarm Control [0: Disarm, 1: Arm]
         force_arm=0, # Param 2 - Force [0: Arm-disarm unless prevented  by safety checks (i.e. when landed), 21196: Force arm/disarm to override preflight check and disarm during flight]
-        _unused=0, # Param 3 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 4 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 5 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 6 - Unused, set to zero to populate all 7 parameters
-        _unused=0 # Param 7 - Unused, set to zero to populate all 7 parameters
+        _unused_1=0, # Param 3 - Unused, set to zero to populate all 7 parameters
+        _unused_2=0, # Param 4 - Unused, set to zero to populate all 7 parameters
+        _unused_3=0, # Param 5 - Unused, set to zero to populate all 7 parameters
+        _unused_4=0, # Param 6 - Unused, set to zero to populate all 7 parameters
+        _unused_5=0 # Param 7 - Unused, set to zero to populate all 7 parameters
     )
 
     msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print ACK to confirm successful execution
@@ -38,11 +38,11 @@ def disarm(vehicle_connection):
         confirmation=0, # Confirmation - 0: First transmission of this cmd, 1-255: Confirmation transmissions (e.g. kill)
         arm=0, # Param 1 - Arm/Disarm Control [0: Disarm, 1: Arm]
         force_arm=0, # Param 2 - Force [0: Arm-disarm unless prevented  by safety checks (i.e. when landed), 21196: Force arm/disarm to override preflight checks and disarm during flight]
-        _unused=0, # Param 3 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 4 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 5 - Unused, set to zero to populate all 7 parameters
-        _unused=0, # Param 6 - Unused, set to zero to populate all 7 parameters
-        _unused=0 # Param 7 - Unused, set to zero to populate all 7 parameters
+        _unused_1=0, # Param 3 - Unused, set to zero to populate all 7 parameters
+        _unused_2=0, # Param 4 - Unused, set to zero to populate all 7 parameters
+        _unused_3=0, # Param 5 - Unused, set to zero to populate all 7 parameters
+        _unused_4=0, # Param 6 - Unused, set to zero to populate all 7 parameters
+        _unused_5=0 # Param 7 - Unused, set to zero to populate all 7 parameters
     )
 
     msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print command ACK to confirm successful execution
