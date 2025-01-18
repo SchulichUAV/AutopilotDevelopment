@@ -10,6 +10,7 @@ import General.Operations.arm as arm
 import General.Operations.initialize as initialize
 import General.Operations.mode as mode
 import General.Operations.altitude as altitude
+import General.Operations.speed as speed
 
 import Plane.Operations.takeoff as takeoff_configuration
 
