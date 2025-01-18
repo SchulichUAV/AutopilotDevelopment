@@ -11,7 +11,7 @@ def set_takeoff_altitude(vehicle_connection, takeoff_height):
         target_system=vehicle_connection.target_system,
         target_component=vehicle_connection.target_component,
         param_id=b'TKOFF_ALT', # takeoff altitude in metres
-        takeoff_height=takeoff_height,
+        param_value=takeoff_height,
         param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
     )
 
@@ -26,7 +26,7 @@ def set_takeoff_angle(vehicle_connection, takeoff_pitch_angle):
         target_system=vehicle_connection.target_system,
         target_component=vehicle_connection.target_component,
         param_id=b'TKOFF_LVL_PITCH',
-        pitch_angle=takeoff_pitch_angle,
+        param_value=takeoff_pitch_angle,
         param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
     )
 

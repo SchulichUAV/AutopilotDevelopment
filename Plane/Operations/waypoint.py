@@ -12,18 +12,18 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude):
     mavlink_message = dialect.MAVLink_mission_item_int_message(
         target_system=vehicle_connection.target_system,
         target_component=vehicle_connection.target_component,
-        sqeuence_number=0, # Waypoint ID: Starts at zero, increases monotonically (0,1,2,3,...)
-        coordinate_frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # Coordinate system of waypoint
+        seq=0, # Waypoint ID: Starts at zero, increases monotonically (0,1,2,3,...)
+        frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # Coordinate system of waypoint
         command=dialect.MAV_CMD_NAV_WAYPOINT,
         current=2, # Current can be set to 2 to work in guided mode
         autocontinue=0, # Autocontinue to next waypoint (0 to pause mission after item completes)
-        hold_time=0, # Hold time [s] at waypoint, ignored by fixed wing 
-        acceptance_radius=0, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
-        pass_radius=0, # 0 to pass through WP. if >0, will CW orbit, <0 will have CCW orbit [m]
-        yaw=0, # Desired yaw [degrees] at WP (NaN to use current system yaw heading mode)
-        latitude=int(latitude * 1e7),
-        longitude=int(longitude * 1e7),
-        altitude=altitude # altitude [m]
+        param1=0, # Hold time [s] at waypoint, ignored by fixed wing 
+        param2=0, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
+        param3=0, # Pass radius, 0 to pass through WP. if >0, will CW orbit, <0 will have CCW orbit [m]
+        param4=0, # Desired yaw [degrees] at WP (NaN to use current system yaw heading mode)
+        x=int(latitude * 1e7), # latitude in degrees *10^7
+        y=int(longitude * 1e7), # longitude in degrees *10^7
+        z=altitude # altitude [m] - relative or absolute depending on frame
     )
     vehicle_connection.mav.send(mavlink_message)
 
