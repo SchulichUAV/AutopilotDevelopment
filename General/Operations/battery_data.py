@@ -16,3 +16,6 @@ vehicle_connection.mav.param_set_send(
         3, # 3 for Avionics battery, may need to be changed
         mavutil.mavlink.MAV_PARAM_TYPE_UINT32
 )
+
+def recieve_battery_data(vehicle_connection):
+    print(vehicle_connection.recv_match(type='BATTERY_STATUS', blocking=True))
