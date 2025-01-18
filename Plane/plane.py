@@ -17,7 +17,7 @@ import Plane.Operations.waypoint as plane_waypoint
 
 class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
-        self.vehicle_connection = plane_initialize.connect_to_vehicle(vehicle_connection)
+        self.vehicle_connection, self.valid_connection = plane_initialize.connect_to_vehicle(vehicle_connection)
         print(f"Connnected to vehicle at {vehicle_connection}")
 
     def arm_vehicle(self):
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     plane.arm_vehicle()
 
     ## example call
-    plane.set_speed(50)
+    plane.set_speed(15)
