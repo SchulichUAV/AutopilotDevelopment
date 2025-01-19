@@ -3,12 +3,14 @@ def mission_acknowledge(vehicle_connection):
     # REQUIRES: vehicle connection
     
     vehicle_connection.mav.mission_ack_send(
-        vehicle_connection.target_system, 
-        vehicle_connection.target_component,
-        0,0,0
+        target_system=vehicle_connection.target_system, 
+        target_component=vehicle_connection.target_component,
+        type=0, # (Mission result) MAV_MISSION_ACCEPTED
+        mission_type=0, # (Mission type) MAV_MISSION_TYPE_MISSION (items are mission commands for main mission)
+        opaque_id=0 # 0 since plan ids aren't supported (multiple mission uploads to vehicle)
     )
 
-    msg = connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
+    msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
 
     if msg:
         print("Received MISSION_ACK!")

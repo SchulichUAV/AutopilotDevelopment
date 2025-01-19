@@ -12,6 +12,6 @@ def set_current_altitude(vehicle_connection, altitude):
             0, 0, 0, 0, 0, 0
     )
 
-    vehicle_connection.send(msg)
+    vehicle_connection.mav.send(msg)
 
     print('Sent new altitude value set to {altitude} meters.')
