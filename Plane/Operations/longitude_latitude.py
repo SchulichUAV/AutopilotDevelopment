@@ -14,7 +14,7 @@ def get_long_lat(vehicle_connection):
         latitude = message.lat / 1e7   # convert from 1e-7 degrees to decimal degrees
         # do not know if the above conversion is necessary 
 
-        print(f"Longitude: {longitude}, Latitude: {latitude}")
+        print(f"Latitude: {latitude}, Longitude: {longitude}")
 
     except Exception as e:
         print(f"Error in recieving GPS data: {e}")

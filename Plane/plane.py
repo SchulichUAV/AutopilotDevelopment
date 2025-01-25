@@ -71,16 +71,8 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
-    # latitude and longitude retrieval
+    ## latitude and longitude retrieval
     def get_longitude_latitude(self):
         plane_long_lat.get_long_lat(self.vehicle_connection)
     
-if __name__ == '__main__':
-    ## establish connection to the plane
-    plane = Plane(vehicle_connection='udpin:127.0.0.1:14550')
-
-    ## arm the vehicle
-    plane.arm_vehicle()
-
-    ## example call
-    plane.get_longitude_latitude()
+   
