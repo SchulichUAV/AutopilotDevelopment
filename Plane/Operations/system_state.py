@@ -54,7 +54,7 @@ def receive_gps_raw(vehicle_connection):
         if message is None:
             print("Timeout: No GPS data received.")
             return None
-        return message
+        return print(message)
     except Exception as e:
         print(f"Error receiving GPS data: {e}")
         return None

@@ -14,6 +14,7 @@ import General.Operations.monitor_waypoint as plane_monitor_waypoint
 import Plane.Operations.system_state as plane_system_state
 import Plane.Operations.takeoff as plane_takeoff_config
 import Plane.Operations.waypoint as plane_waypoint
+import Plane.Operations.longitude_latitude as plane_long_lat
 
 class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
@@ -70,6 +71,9 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
+    # latitude and longitude retrieval
+    def get_longitude_latitude(self):
+        plane_long_lat.get_long_lat(self.vehicle_connection)
     
 if __name__ == '__main__':
     ## establish connection to the plane
@@ -79,4 +83,4 @@ if __name__ == '__main__':
     plane.arm_vehicle()
 
     ## example call
-    plane.set_speed(15)
+    plane.get_longitude_latitude()
