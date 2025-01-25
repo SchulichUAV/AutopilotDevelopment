@@ -13,24 +13,32 @@ def receive_wp(vehicle_connection):
     PROMISES: Returns data about the current target waypoint
     REQUIRES: vehicle_con recieves the vehicle connection as an input
     '''
-    return vehicle_connection.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True)
-
+    try:
+        return vehicle_connection.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True)
+    except Exception as e:
+        print(f"Error in function: receive_wp() from file: General/Operations/monitor_waypoint.py -> {e}")
 
 def receive_speeds(vehicle_connection):
     '''
     PROMISES: Returns data about the airspeed, groundspeed, throttle, etc.
     REQUIRES: vehicle_con recieves the vehicle connection as an input
     '''
-    speed_data = vehicle_connection.recv_match(type='VFR_HUD', blocking=True)
-    return speed_data
+    try:
+        speed_data = vehicle_connection.recv_match(type='VFR_HUD', blocking=True)
+        return speed_data
+    except Exception as e:
+        print(f"Error in function: receive_speeds() from file: General/Operations/monitor_waypoint.py -> {e}")
 
 def waypoint_eta(vehicle_connection):
     '''
     PROMISES: Returns the estimated time (in seconds) until the current target waypoint is reached
     REQUIRES: vehicle_con recieves the vehicle connection as an input
     '''
-    wp_distance = receive_wp(vehicle_connection).wp_dist # find the distance to the target waypoint
-    airspeed = receive_speeds(vehicle_connection).airspeed # find the current airspeed
+    try:
+        wp_distance = receive_wp(vehicle_connection).wp_dist # find the distance to the target waypoint
+        airspeed = receive_speeds(vehicle_connection).airspeed # find the current airspeed
 
-    wp_ETA = wp_distance / airspeed #calculate the ETA until the waypoint is reached
-    return wp_ETA
+        wp_ETA = wp_distance / airspeed #calculate the ETA until the waypoint is reached
+        return wp_ETA
+    except Exception as e:
+        print(f"Error in function: waypoint_eta() from file: General/Operations/monitor_waypoint.py -> {e}")

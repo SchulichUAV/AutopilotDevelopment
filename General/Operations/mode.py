@@ -62,19 +62,22 @@ copter_modes = {
 def set_mode(vehicle_connection, mode_id):
     # PROMISES: The vehicle will switch to the specified flight mode
     # REQUIRES: Vehicle connection, mode ID
-    vehicle_connection.mav.command_long_send( # Specify COMMAND_LONG
-        target_system=vehicle_connection.target_system, # Specify target system
-        target_component=vehicle_connection.target_component, # Specify target component
-        command=mavutil.mavlink.MAV_CMD_DO_SET_MODE, # Command ID (or enum of command) - Set mode command
-        confirmation=0, # Confirmation - 0: First transmission of this cmd, 1-255: Confirmation transmissions (e.g. kill)
-        param1=mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, # Param 1 - custom mode identification; MAV_MODE_FLAG_CUSTOM_MODE_ENABLED=1 (Enable custom mode identification)
-        param2=mode_id, # Param 2 - Flight mode number
-        param3=0, # Param 3 - Unused, set to zero to populate all 7 parameters
-        param4=0, # Param 4 - Unused, set to zero to populate all 7 parameters
-        param5=0, # Param 5 - Unused, set to zero to populate all 7 parameters
-        param6=0, # Param 6 - Unused, set to zero to populate all 7 parameters
-        param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
-    )
+    try:
+        vehicle_connection.mav.command_long_send( # Specify COMMAND_LONG
+            target_system=vehicle_connection.target_system, # Specify target system
+            target_component=vehicle_connection.target_component, # Specify target component
+            command=mavutil.mavlink.MAV_CMD_DO_SET_MODE, # Command ID (or enum of command) - Set mode command
+            confirmation=0, # Confirmation - 0: First transmission of this cmd, 1-255: Confirmation transmissions (e.g. kill)
+            param1=mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, # Param 1 - custom mode identification; MAV_MODE_FLAG_CUSTOM_MODE_ENABLED=1 (Enable custom mode identification)
+            param2=mode_id, # Param 2 - Flight mode number
+            param3=0, # Param 3 - Unused, set to zero to populate all 7 parameters
+            param4=0, # Param 4 - Unused, set to zero to populate all 7 parameters
+            param5=0, # Param 5 - Unused, set to zero to populate all 7 parameters
+            param6=0, # Param 6 - Unused, set to zero to populate all 7 parameters
+            param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
+        )
 
-    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) 
-    print(msg)
+        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) 
+        print(msg)
+    except Exception as e:
+        print(f"Error in function: set_mode() from file: General/Operations/mode.py -> {e}")
