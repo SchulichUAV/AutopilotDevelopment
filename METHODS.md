@@ -13,6 +13,9 @@
   - [.recv_match()](#.recv_match())
   - [.wait_heartbeat()](#.wait_heartbeat())
 
+It is worth noting that [MAVLink documentation](https://mavlink.io/en/messages/common.html) will always be the ultimate source of truth.
+This documentation is built on top of MAVLink documentation at the time of development for future reference since MAVLink documentation is not the easiest to read.
+
 ---
 
 ## vehicle_connection.mav methods
@@ -22,6 +25,7 @@
 **Description**: Sends a parameter set request to the target system and component.
 
 **Template**:
+
 ```python
 vehicle_connection.mav.param_set_send(
     target_system=<TARGET_SYSTEM>,
@@ -31,7 +35,7 @@ vehicle_connection.mav.param_set_send(
     param_type=<PARAM_TYPE_FROM_LIST>  # MAVLink parameter type
 )
 ```
-**Example**:
+**Example**: Set the takeoff pitch parameter (angle of climb)
 ```python
 vehicle_connection.mav.param_set_send(
     target_system=vehicle_connection.target_system,
@@ -49,46 +53,35 @@ vehicle_connection.mav.param_set_send(
 
 ```python
 mavlink_message = dialect.<MAVLink_Message_Type>(
-    target_system=<TARGET_SYSTEM>,
-    target_component=<TARGET_COMPONENT>,
-    sequence_number=<SEQUENCE_NUMBER>,  # Sequence number for the message
-    coordinate_frame=<COORDINATE_FRAME_FROM_LIST>,  # Coordinate system (if applicable)
-    command=<COMMAND_FROM_LIST>,  # MAVLink command (if applicable)
-    current=<CURRENT>,  # Whether the command is current (specific to the message type)
-    autocontinue=<AUTOCONTINUE>,  # Autocontinue to next command
-    hold_time=<HOLD_TIME>,  # Hold time (specific to the message type)
-    acceptance_radius=<ACCEPTANCE_RADIUS>,  # Acceptance radius (if applicable)
-    pass_radius=<PASS_RADIUS>,  # Pass-through radius (if applicable)
-    yaw=<YAW>,  # Desired yaw (if applicable)
-    latitude=<LATITUDE>,  # Latitude * 1e7 (if applicable)
-    longitude=<LONGITUDE>,  # Longitude * 1e7 (if applicable)
-    altitude=<ALTITUDE>  # Altitude (if applicable)
+    # The content contained within here must be populated based on the `MAVLink_Message_Type`
 )
 
 vehicle_connection.mav.send(mavlink_message)
 ```
 
-**Example**:
+**Example**: Set a waypoint for a plane in guided mode
 
 ```python
 mavlink_message = dialect.MAVLink_mission_item_int_message(
     target_system=vehicle_connection.target_system,
     target_component=vehicle_connection.target_component,
-    sequence_number=0,  # Sequence number of the message
-    coordinate_frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,  # Coordinate frame
+    seq=0,  # Sequence number of the message
+    frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,  # Coordinate frame
     command=dialect.MAV_CMD_NAV_WAYPOINT,  # Command (optional, depends on use case)
-    current=2,  # Whether this is the current command (specific to the message type)
+    current=2,  # Whether this is the current command (may be set to 2 for guided plane commands)
     autocontinue=0,  # Autocontinue to next command
-    hold_time=0,  # Hold time at position (specific to the message type)
-    acceptance_radius=0,  # Radius for acceptance (specific to the message type)
-    pass_radius=0,  # Pass-through radius (specific to the message type)
-    yaw=0,  # Desired yaw
-    latitude=int(latitude * 1e7),  # Latitude in degrees * 1e7
-    longitude=int(longitude * 1e7),  # Longitude in degrees * 1e7
-    altitude=altitude  # Altitude in meters
+    param1=0,  # Hold time at position (specific to the message type)
+    param2=0,  # Radius for acceptance (specific to the message type)
+    param3=0,  # Pass-through radius (specific to the message type)
+    param4=0,  # Desired yaw
+    x=int(latitude * 1e7),  # Latitude in degrees * 1e7
+    y=int(longitude * 1e7),  # Longitude in degrees * 1e7
+    z=altitude  # Altitude in meters
 )
 vehicle_connection.mav.send(mavlink_message)
 ```
+
+Note that the content of the `mavlink_message` was populated based on the [mission_item_int message](https://mavlink.io/en/messages/common.html#MISSION_ITEM_INT). This would vary depending on the mavlink message type.
 
 ---
 ### `command_long_send()`
@@ -111,7 +104,7 @@ vehicle_connection.mav.command_long_send(
     param7=<PARAM7>   # Altitude or command-specific parameter
 )
 ```
-**Example:**
+**Example**: Send a takeoff command
 
 ```python
 vehicle_connection.mav.command_long_send(
@@ -139,7 +132,7 @@ vehicle_connection.mav.mission_ack_send(
     opaque_id=<OPAQUE_ID>  # Plan ID if supported, else 0
 )
 ```
-**Example**:
+**Example**: Request an ack for a mission-related message
 
 ```python
 vehicle_connection.mav.mission_ack_send(
@@ -164,7 +157,7 @@ vehicle_connection.mav.param_request_read_send(
     param_index=<PARAM_INDEX>  # -1 to use param ID, or parameter index
 )
 ```
-**Example**:
+**Example**: Request the value for a parameter
 
 ```python
 vehicle_connection.mav.param_request_read_send(
@@ -192,7 +185,7 @@ vehicle_connection.mav.recv_match(
     timeout=<TIMEOUT_NUMBER>  # optional timeout (seconds) if not blocking indefinitely
 )
 ```
-**Example**:
+**Example**: Change the speed of the vehicle
 
 ```python
 def change_speed(vehicle_connection, speed, throttle=-1):
@@ -241,7 +234,7 @@ Waits for a heartbeat message from the vehicle. This is typically used to ensure
 ```python
 vehicle_connection.wait_heartbeat()
 ```
-**Example**:
+**Example**: Wait for a heartbeat to verify connection to the vehicle
 
 The following example demonstrates how to verify the connection to the vehicle by waiting for a heartbeat message:
 
