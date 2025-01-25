@@ -12,5 +12,5 @@ vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0
 
 
 while(1):
-    get_battery.recieve_battery_data(vehicle_connection)
+    get_battery.receive_battery_data(vehicle_connection)
     time.sleep(1)
