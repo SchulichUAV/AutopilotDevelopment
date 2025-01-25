@@ -11,10 +11,4 @@ It is recommended to use a Linux distribution, or install WSL on Windows systems
 
 ### Note: Files in Copter folder is only supported by copter configurations, Plane folder only supports plane operations, and General supports both.
 
-initialize.py - Establishes and verifies the connection to the vehicle.<br>
-arm.py - Provides methods to arm and disarm the aerial vehicle.<br>
-takeoff.py - Allows the vehicle to takeoff to a target altitude (relative to home altitude)<br>
-mode.py - Switches flight modes<br>
-waypoint.py - Flies to a specified waypoint relative to the current position, or through geo-coordinates<br>
-takeoffConfiguration.py - Allows the integrator to change pre-takeoff fixed wing configurations.<br>
-
+Please see `Development.md` and `Methods.md` for development guidance.
