@@ -11,7 +11,7 @@ def set_current_altitude(vehicle_connection, altitude):
         command=mavutil.mavlink.MAV_CMD_DO_CHANGE_ALTITUDE,
         current=0, # Not used here, arbitrary value
         autocontinue=0, # Not used here, arbitrary value
-        param1=altitude
+        param1=altitude,
         param2=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, 
         param3=0, # Not used here, arbitrary value
         param4=0, # Not used here, arbitrary value
