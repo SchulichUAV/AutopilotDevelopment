@@ -42,25 +42,27 @@ def check_valid_speed(speed):
     return 0
 
 
-def change_speed(vehicle_connection, speed, throttle=-1):
+def set_guided_airspeed(vehicle_connection, speed, throttle=-1):
     # PROMISES: The vehicle's speed can be dynamically changed
     # REQUIRES: Vehicle connection, and speed
 
     if(check_valid_speed(speed) == 1): #if speed is invalid, exit function
         return
 
-    vehicle_connection.mav.command_long_send( # Specify COMMAND_LONG
-        target_system=vehicle_connection.target_system, # Specify vehicle target system
-        target_component=vehicle_connection.target_component, # Specify the vehicle target component
-        command=mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED, # Specify speed command
-        confirmation=0, # Confirmation - 0: First transmission of this cmd, 1-255: Confirmation transmissions (e.g. kill)
-        param1=mavutil.mavlink.SPEED_TYPE_GROUNDSPEED, # Param 1 - setting speed type
-        param2=speed, # Param 2 - speed in m/s
-        param3=throttle, # Param 3 - throttle in percent
-        param4=0, # Param 4 - Unused, set to zero to populate all 7 parameters
-        param5=0, # Param 5 - Unused, set to zero to populate all 7 parameters
-        param6=0, # Param 6 - Unused, set to zero to populate all 7 parameters
-        param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
+    vehicle_connection.mav.command_int_send(
+        target_system=vehicle_connection.target_system,
+        target_component=vehicle_connection.target_component,
+        frame=mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, # Not used here, passing arbitrary value
+        command=mavutil.mavlink.MAV_CMD_GUIDED_CHANGE_SPEED,
+        current=0, # Not used here, arbitrary value
+        autocontinue=0, # Not used here, arbitrary value
+        param1=0, # Speed type: 0 = Airspeed
+        param2=speed, # Not used here, arbitrary value
+        param3=-1, # Throttle: -1 = no throttle change
+        param4=0, # Not used here, arbitrary value
+        x=0, # Not used here, arbitrary value
+        y=0, # Not used here, arbitrary value
+        z=0 # Not used here, arbitrary value
     )
 
     msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print ACK to confirm successful execution
