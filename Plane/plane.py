@@ -14,7 +14,6 @@ import General.Operations.monitor_waypoint as plane_monitor_waypoint
 import Plane.Operations.system_state as plane_system_state
 import Plane.Operations.takeoff as plane_takeoff_config
 import Plane.Operations.waypoint as plane_waypoint
-import Plane.Operations.longitude_latitude as plane_long_lat
 
 class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
@@ -49,6 +48,9 @@ class Plane:
     def get_gps_raw(self):
         return plane_system_state.receive_gps_raw(self.vehicle_connection)
     
+    def get_lat_long(self):
+        return plane_system_state.receive_lat_long(self.vehicle_connection)
+    
     ## from system state, we still need gps status, scaled imu, utm_global_position and wind_cov
 
     ## takeoff configurations
@@ -71,8 +73,5 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
-    ## latitude and longitude retrieval
-    def get_longitude_latitude(self):
-        plane_long_lat.get_long_lat(self.vehicle_connection)
     
    
