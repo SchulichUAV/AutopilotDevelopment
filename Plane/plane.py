@@ -52,7 +52,7 @@ class Plane:
         lat_long_data = plane_system_state.receive_lat_long(self.vehicle_connection)
         if lat_long_data:
             print(f"Latitude: {lat_long_data['latitude']}, Longitude: {lat_long_data['longitude']}")
-    
+        return lat_long_data
     ## from system state, we still need gps status, scaled imu, utm_global_position and wind_cov
 
     ## takeoff configurations
