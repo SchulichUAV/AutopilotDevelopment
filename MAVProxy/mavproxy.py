@@ -3,10 +3,10 @@ import time
 
 from MAVProxy.modules.lib import mp_module
 
-class suav_heartbeat(mp_module.MPModule):
+class suav(mp_module.MPModule):
     def __init__(self, mpstate):
         """Initialise module"""
-        super(suav_heartbeat, self).__init__(mpstate, "suav_heartbeat", "SUAV information extraction")
+        super(suav, self).__init__(mpstate, "suav", "SUAV information extraction")
         self.emit_interval = 0.1
         self.last_emitted = time.time()
         self.sock = socket.socket(socket.AF_INET, # Internet
