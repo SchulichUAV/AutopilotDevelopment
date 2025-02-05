@@ -49,7 +49,9 @@ class Plane:
         return plane_system_state.receive_gps_raw(self.vehicle_connection)
     
     def get_lat_long(self):
-        return plane_system_state.receive_lat_long(self.vehicle_connection)
+        lat_long_data = plane_system_state.receive_lat_long(self.vehicle_connection)
+        if lat_long_data:
+            print(f"Latitude: {lat_long_data['latitude']}, Longitude: {lat_long_data['longitude']}")
     
     ## from system state, we still need gps status, scaled imu, utm_global_position and wind_cov
 
@@ -72,6 +74,3 @@ class Plane:
 
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
-
-    
-   

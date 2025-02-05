@@ -64,7 +64,7 @@ def receive_lat_long(vehicle_connection):
     # PROMISES: Retrieve latitude and longitude from aircraft
     # REQUIRES: Vehicle connection
     try:
-        message = vehicle_connection.recv_match(type='GPS_RAW_INT', blocking='True')
+        message = vehicle_connection.recv_match(type='GPS_RAW_INT', blocking='True', timeout=5)
         if message is None:
             print("Timeout: No Longitude and Latitude data recieved.")
             return None
@@ -72,7 +72,7 @@ def receive_lat_long(vehicle_connection):
         latitude = message.lat / 1e7   # convert from 1e-7 degrees to decimal degrees
         longitude = message.lon / 1e7  # convert from 1e-7 degrees to decimal degrees
 
-        print(f"Latitude: {latitude}, Longitude: {longitude}")
+        return{"latitude": latitude, "longitude": longitude}
 
     except Exception as e:
         print(f"Error in receiving GPS data: {e}")
