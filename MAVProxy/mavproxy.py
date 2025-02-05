@@ -69,7 +69,6 @@ class suav_heartbeat(mp_module.MPModule):
                 self.speed_uncertainty = speed_uncertainty # Speed uncertainty (mm)
                 self.heading_uncertainty = heading_uncertainty # Heading uncertainty (mm)
             
-
     def send_data(self):
         t = time.time()
         heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
@@ -87,4 +86,4 @@ class suav_heartbeat(mp_module.MPModule):
 
 def init(mpstate):
     '''initialise module'''
-    return suav_heartbeat(mpstate)
+    return suav(mpstate)
