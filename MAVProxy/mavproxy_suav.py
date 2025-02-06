@@ -12,40 +12,34 @@ class suav(mp_module.MPModule):
         self.sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 
-            self.lat = 0
-            self.lon = 0
-            self.rel_alt = 0
-            self.alt = 0
+        self.lat = 0
+        self.lon = 0
+        self.rel_alt = 0
+        self.alt = 0
 
-            self.pitch = 0
-            self.yaw = 0
-            self.roll = 0
+        self.pitch = 0
+        self.yaw = 0
+        self.roll = 0
 
-            self.dlat = 0
-            self.dlon = 0
-            self.dalt = 0
-            self.heading = 0
+        self.dlat = 0
+        self.dlon = 0
+        self.dalt = 0
+        self.heading = 0
 
-            self.num_satellites = 0
-            self.position_uncertainty = 0
-            self.alt_uncertainty = 0
-            self.speed_uncertainty = 0
-            self.heading_uncertainty = 0
-        except Exception as e:
-            print(f"Error in function: __init__() from file: MAVProxy/pixhawk.py -> {e}")
+        self.num_satellites = 0
+        self.position_uncertainty = 0
+        self.alt_uncertainty = 0
+        self.speed_uncertainty = 0
+        self.heading_uncertainty = 0
 
     def idle_task(self):
         '''called rapidly by mavproxy'''
-        try:
-            now = time.time()
-            if now-self.last_emitted > self.emit_interval:
-                self.last_emitted = now
+        now = time.time()
+        if now-self.last_emitted > self.emit_interval:
+            self.last_emitted = now
 
-                if self.lat != 0:
-                    self.send_data()
-        except Exception as e:
-            print(f"Error in function: idle_task() from file: MAVProxy/pixhawk.py -> {e}")
-
+            if self.lat != 0:
+                self.send_data()
 
     def mavlink_packet(self, m):
         '''handle mavlink packets'''
@@ -76,25 +70,19 @@ class suav(mp_module.MPModule):
                 self.heading_uncertainty = heading_uncertainty # Heading uncertainty (mm)
             
     def send_data(self):
-        try:
-            t = time.time()
-            heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
-                            self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty)
-            heartbeat_message = f"{heartbeat_data}".encode()
-            self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
-        except Exception as e:
-            print(f"Error in function: send_data() from file: MAVProxy/pixhawk.py -> {e}")
+        t = time.time()
+        heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
+                        self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty)
+        heartbeat_message = f"{heartbeat_data}".encode()
+        self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
 
     def encode_message(self, items):
-        try:
-            message = ""
-            for index, item in enumerate(items):
-                message += str(item)
-                if index != len(items) - 1:
-                    message += ","
-            return message.encode()
-        except Exception as e:
-            print(f"Error in function: encode_message() from file: MAVProxy/pixhawk.py -> {e}")
+        message = ""
+        for index, item in enumerate(items):
+            message += str(item)
+            if index != len(items) - 1:
+                message += ","
+        return message.encode()
 
 def init(mpstate):
     '''initialise module'''
