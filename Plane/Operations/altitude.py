@@ -23,5 +23,5 @@ def set_current_altitude(vehicle_connection, altitude):
     except Exception as e:
         print(f"Error in function: set_current_altitude() from file: Plane/Operations/altitude.py -> {e}")
 
-    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True)
+    msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True, timeout=5)
     print(msg)

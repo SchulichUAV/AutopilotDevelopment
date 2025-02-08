@@ -77,7 +77,7 @@ def set_mode(vehicle_connection, mode_id):
             param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
         )
 
-        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) 
+        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True, timeout=5) 
         print(msg)
     except Exception as e:
         print(f"Error in function: set_mode() from file: General/Operations/mode.py -> {e}")

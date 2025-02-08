@@ -24,7 +24,7 @@ def arm(vehicle_connection):
             param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
         )
 
-        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print ACK to confirm successful execution
+        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True, timeout=5) # Print ACK to confirm successful execution
         print(msg)
     except Exception as e:
         print(f"Error in function: arm() from file: General/Operations/arm.py -> {e}")
@@ -47,7 +47,7 @@ def disarm(vehicle_connection):
             param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
         )
 
-        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print command ACK to confirm successful execution
+        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True, timeout=5) # Print command ACK to confirm successful execution
         print(msg)
     except Exception as e:
         print(f"Error in function: disarm() from file: General/Operations/arm.py -> {e}")

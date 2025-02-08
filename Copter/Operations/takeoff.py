@@ -21,7 +21,7 @@ def takeoff(vehicle_connection, takeoff_height):
             takeoff_height # Param 7 - Height to ascend to (in metres)
         )
 
-        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print command ACK to confirm successful execution
+        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True, timeout=5) # Print command ACK to confirm successful execution
         print(msg)
     except Exception as e:
         print(f"Error in function: takeoff() from file: Copter/Operations/takeoff.py -> {e}")

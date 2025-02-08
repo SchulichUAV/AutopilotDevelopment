@@ -64,7 +64,7 @@ def change_speed(vehicle_connection, speed, throttle=-1):
             param7=0 # Param 7 - Unused, set to zero to populate all 7 parameters
         )
 
-        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True) # Print ACK to confirm successful execution
+        msg = vehicle_connection.recv_match(type='COMMAND_ACK', blocking=True, timeout=5) # Print ACK to confirm successful execution
         print(msg)
     except Exception as e:
         print(f"Error in function: change_speed() from file: General/Operations/speed.py -> {e}")
@@ -84,7 +84,7 @@ def set_cruise_speed(vehicle_connection, speed):
             param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
         )
 
-        message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+        message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True, timeout=5).to_dict()
         print('name: %s\tvalue: %d' %
             (message['param_id'], message['param_value']))
     except Exception as e:

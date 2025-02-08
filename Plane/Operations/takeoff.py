@@ -16,7 +16,7 @@ def set_takeoff_altitude(vehicle_connection, takeoff_height):
             param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
         )
 
-        message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+        message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True, timeout=5).to_dict()
         print('name: %s\tvalue: %d' %
             (message['param_id'], message['param_value']))
     except Exception as e:
@@ -34,7 +34,7 @@ def set_takeoff_angle(vehicle_connection, takeoff_pitch_angle):
             param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
         )
 
-        message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+        message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True, timeout=5).to_dict()
         print('name: %s\tvalue: %d' %
             (message['param_id'], message['param_value']))
     except Exception as e:

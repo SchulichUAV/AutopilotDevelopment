@@ -11,7 +11,7 @@ def waypoint_progress(vehicle_connection):
     # REQUIRES: Vehicle connection
     try:
         while 1: # Note that if you run this, you will not be able to see live progressions in Mission Planner
-            msg = vehicle_connection.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True) # Print command ACK to confirm successful execution
+            msg = vehicle_connection.recv_match(type='NAV_CONTROLLER_OUTPUT', blocking=True, timeout=5) # Print command ACK to confirm successful execution
             print(msg)
 
             if msg and msg.wp_dist == 0:

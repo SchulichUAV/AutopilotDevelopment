@@ -27,7 +27,7 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude):
         )
         vehicle_connection.mav.send(mavlink_message)
 
-        received_message = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True)
+        received_message = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
         print(received_message)
     except Exception as e:
         print(f"Error in function: set_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
@@ -52,7 +52,7 @@ def set_waypoint_radius(vehicle_connection, radius):
             param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
         )
 
-        received_message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+        received_message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True, timeout=5).to_dict()
         print('name: %s\tvalue: %d' %
             (received_message['param_id'], received_message['param_value']))
     except Exception as e:
@@ -83,7 +83,7 @@ def set_waypoint_loiter_radius(vehicle_connection, loiter_radius):
             param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
         )
 
-        received_message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+        received_message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True, timeout=5).to_dict()
         print('name: %s\tvalue: %d' %
             (received_message['param_id'], received_message['param_value']))
     except Exception as e:
@@ -114,7 +114,7 @@ def set_waypoint_rtl_loiter_radius(vehicle_connection, rtl_loiter_radius):
             param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
         )
 
-        received_message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True).to_dict()
+        received_message = vehicle_connection.recv_match(type='PARAM_VALUE', blocking=True, timeout=5).to_dict()
         print('name: %s\tvalue: %d' %
             (received_message['param_id'], received_message['param_value']))
     except Exception as e:
