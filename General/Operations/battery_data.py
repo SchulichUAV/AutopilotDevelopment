@@ -22,4 +22,7 @@ def receive_battery_data(vehicle_connection):
     PROMISES: Receives information about the system's battery
     REQUIRES: Vehicle connection
     '''
-    print(vehicle_connection.recv_match(type='BATTERY_STATUS', blocking=True))
+    try:
+        print(vehicle_connection.recv_match(type='BATTERY_STATUS', blocking=True, timeout=5))
+    except Exception as e:
+        print(f"Error in function: receive_battery_data() from file: General/Operations/battery_data.py -> {e}")

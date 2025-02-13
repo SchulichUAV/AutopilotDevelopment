@@ -50,11 +50,10 @@ def receive_gps_raw(vehicle_connection):
     # PROMISES: Retrieves general gps data
     # REQUIRES: Vehicle connection
     try:
-        message = vehicle_connection.recv_match(type='GPS_RAW_INT', blocking='True', timeout=5)
+        message = vehicle_connection.recv_match(type='GPS_RAW_INT', blocking='True')
         if message is None:
             print("Timeout: No GPS data received.")
             return None
-        print(message)
         return message
     except Exception as e:
         print(f"Error receiving GPS data: {e}")
