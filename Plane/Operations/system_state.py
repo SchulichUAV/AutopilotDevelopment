@@ -3,7 +3,7 @@
 from pymavlink import mavutil
 
 def receive_system_status(vehicle_connection):
-    # PROMISES: Retreives general system state information of plane
+    # PROMISES: Retrieves general system state information of plane
     # REQUIRES: Vehicle connection
     try: 
         return vehicle_connection.recv_match(type='SYS_STATUS', blocking='True')
@@ -12,7 +12,7 @@ def receive_system_status(vehicle_connection):
         return None
 
 def receive_param_request_read(vehicle_connection, param_id):
-    # PROMISES: Retreives value of parameter thats passed in
+    # PROMISES: Retrieves value of parameter thats passed in
     # REQUIRES: Vehicle connection, the desired parameter thats passed in
     param_id_bytes = param_id.encode('utf-8')
     
@@ -59,12 +59,36 @@ def receive_gps_raw(vehicle_connection):
         print(f"Error receiving GPS data: {e}")
         return None
 
-# def receive_gps_status(vehicle_connection):
-#     # PROMISES:
-#     # REQUIRES:
-#     return vehicle_connection.recv_match(type='GPS_STATUS', blocking='True')
+def receive_lat_long(vehicle_connection):
+    # PROMISES: Retrieve latitude and longitude from aircraft
+    # REQUIRES: Vehicle connection
+    try:
+        message = vehicle_connection.recv_match(type='GPS_RAW_INT', blocking='True', timeout=5)
+        if message is None:
+            print("Timeout: No Longitude and Latitude data recieved.")
+            return None
+        
+        latitude = message.lat / 1e7   # convert from 1e-7 degrees to decimal degrees
+        longitude = message.lon / 1e7  # convert from 1e-7 degrees to decimal degrees
 
-# def receive_scaled_imu(vehicle_connection):
-#     # PROMISES:
-#     # REQUIRES:
-#     vehicle_connection.recv_match(type='SCALED_IMU', blocking='True')
+        return{"latitude": latitude, "longitude": longitude}
+
+    except Exception as e:
+        print(f"Error in receiving GPS data: {e}")
+        return None
+
+def receive_gps_status(vehicle_connection):
+    '''
+    STILL PENDING TESTING
+    '''
+    # PROMISES: Retrieves GPS status
+    # REQUIRES: Vehicle connection
+    return vehicle_connection.recv_match(type='GPS_STATUS', blocking='True')
+
+def receive_scaled_imu(vehicle_connection):
+    '''
+    STILL PENDING TESTING
+    '''
+    # PROMISES: Retrieves scaled IMU information
+    # REQUIRES: Vehicle connection
+    vehicle_connection.recv_match(type='SCALED_IMU', blocking='True')
