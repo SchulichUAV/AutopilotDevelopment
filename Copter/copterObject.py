@@ -41,7 +41,7 @@ class Copter:
     def calculate_waypoint_eta(self):
         return copter_monitor_waypoint.waypoint_eta(self.vehicle_connection)
 
-    def set_takeoff_altitude(self, height): 
+    def set_takeoff(self, height): 
         ## may want to change how this works and store a takeoff value since copter_takeoff.takeoff() sets height then immediately takes off
         copter_takeoff.takeoff(self.vehicle_connection, height)
 
