@@ -5,7 +5,7 @@
 from pymavlink import mavutil
 import pymavlink.dialects.v20.all as dialect
 
-def set_waypoint(vehicle_connection, latitude, longitude, altitude):
+def set_waypoint(vehicle_connection, latitude, longitude, altitude, autocontinue=0):
     # PROMISES: Will set a waypoint to fly to in guided mode
     # REQUIRES: A vehicle connection, latitude, longitude, and altitude to fly to
     try:
@@ -16,7 +16,7 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude):
             frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # Coordinate system of waypoint
             command=dialect.MAV_CMD_NAV_WAYPOINT,
             current=2, # Current can be set to 2 to work in guided mode
-            autocontinue=0, # Autocontinue to next waypoint (0 to pause mission after item completes)
+            autocontinue=autocontinue, # Autocontinue to next waypoint (0 to pause mission after item completes)
             param1=0, # Hold time [s] at waypoint, ignored by fixed wing 
             param2=0, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
             param3=0, # Pass radius, 0 to pass through WP. if >0, will CW orbit, <0 will have CCW orbit [m]
