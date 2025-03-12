@@ -42,7 +42,7 @@ def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, auto
             seq=seq, # Waypoint ID
             frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # Coordinate system of waypoint
             command=dialect.MAV_CMD_NAV_WAYPOINT,
-            current=1 if seq == 0 else 0, # Current is set to 1 for first waypoint in mission
+            current=0, # Current should be set to 0 for missions
             autocontinue=autocontinue, # Autocontinue to next waypoint (0 to pause mission after item completes)
             param1=0, # Ignored 
             param2=0, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
