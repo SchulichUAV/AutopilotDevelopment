@@ -32,7 +32,7 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude, autocontinue
     except Exception as e:
         print(f"Error in function: set_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
 
-def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, autocontinue, seq):
+def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, seq):
     # PROMISES: Will return a MISSION_ITEM_INT message
     # REQUIRES: a vehicle connection, latitude, longitude, altitude, an autocontinue flag, and a sequence number for the waypoint.
     try:
@@ -43,7 +43,7 @@ def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, auto
             frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # Coordinate system of waypoint
             command=dialect.MAV_CMD_NAV_WAYPOINT,
             current=0, # Current should be set to 0 for missions
-            autocontinue=autocontinue, # Autocontinue to next waypoint (0 to pause mission after item completes)
+            autocontinue=0, # Ignored by ArduPlane, as fixed-wing aircraft continuously follow mission waypoints in and do not pause at waypoints.
             param1=0, # Ignored 
             param2=0, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
             param3=0, # Pass radius, 0 to pass through WP. if >0, will CW orbit, <0 will have CCW orbit [m]
@@ -56,6 +56,32 @@ def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, auto
 
     except Exception as e:
         print(f"Error in function: set_mission_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
+
+def set_mission_loiter_waypoint(vehicle_connection, latitude, longitude, altitude, radius, seq):
+    # PROMISES: Will return a MISSION_ITEM_INT message
+    # REQUIRES: a vehicle connection, latitude, longitude, altitude, waypoint radius, and a sequence number for the waypoint.
+    try:
+        mavlink_message = dialect.MAVLink_mission_item_int_message(
+            target_system=vehicle_connection.target_system,
+            target_component=vehicle_connection.target_component,
+            seq=seq, # Waypoint ID
+            frame=dialect.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, # Coordinate system of waypoint
+            command=dialect.MAV_CMD_NAV_LOITER_UNLIM,
+            current=0, # Current should be set to 0 for missions
+            autocontinue=0, # Ignored by ArduPlane, as fixed-wing aircraft continuously follow mission waypoints in and do not pause at waypoints.
+            param1=0, # Ignored 
+            param2=0, # Ignored 
+            param3=radius, # Loiter radius. if >0, will loiter CW, <0 will loiter CCW [m]
+            param4=0, # Ignored
+            x=int(latitude * 1e7), # latitude in degrees *10^7
+            y=int(longitude * 1e7), # longitude in degrees *10^7
+            z=altitude # altitude [m] - relative or absolute depending on frame
+        )
+        return mavlink_message
+
+    except Exception as e:
+        print(f"Error in function: set_mission_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
+
 
 def set_waypoint_radius(vehicle_connection, radius):
     # PROMISES: Sets fixed-wing vehicle waypoint radius configuration
