@@ -2,6 +2,7 @@ import pymavlink.dialects.v20.all as dialect
 import Plane.Operations.waypoint as waypoint
 
 northing_offset = 1000
+waypoint_radius = 50
 
 def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
@@ -32,14 +33,14 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
             )
 
             if msg is None and msg.seq == waypointId:
-                print("Mission upload failed: No request received from autopilot.")
+                print("Mission upload failed: No valid request received from autopilot.")
                 return False
 
             print(f"Sending waypoint {waypointId}")
 
             # payload waypoint
             if waypointId == 2:
-                waypoint.set_mission_loiter_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], 50, waypointId)
+                waypoint.set_mission_loiter_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypoint_radius, waypointId)
             # offset waypoint
             else:
                 waypoint.set_mission_waypoint_with_offset(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, northing_offset)
