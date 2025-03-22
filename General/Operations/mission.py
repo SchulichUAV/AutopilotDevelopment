@@ -1,16 +1,18 @@
 import pymavlink.dialects.v20.all as dialect
+import Plane.Operations.waypoint as waypoint
 
-def upload_mission_waypoints(vehicle_connection, waypoints_map):
+northing_offset = 1000
+
+def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
-    # REQUIRES: A vehicle connection, a 
+    # REQUIRES: A vehicle connection and a payload object location
     # Note:
     # - Waypoint 0 (Home position) is typically managed by the autopilot and will be ignored by the autopilot
-    # - Although, autopilot will still request waypoint 0
+    # - The autopilot will still request waypoint 0, but this function will send the "first" waypoint regardless
     # - The function will block until all waypoints are uploaded or a failure occurs.
 
     try:
-        count = len(waypoints_map)
-        
+        count = 3
         # Begin mission upload
         mission_count_msg = dialect.MAVLink_mission_count_message(
             target_system=vehicle_connection.target_system,
@@ -29,12 +31,18 @@ def upload_mission_waypoints(vehicle_connection, waypoints_map):
                 timeout=5
             )
 
-            if msg is None:
+            if msg is None and msg.seq == waypointId:
                 print("Mission upload failed: No request received from autopilot.")
                 return False
 
             print(f"Sending waypoint {waypointId}")
-            vehicle_connection.mav.send(waypoints_map[waypointId])
+
+            # payload waypoint
+            if waypointId == 2:
+                waypoint.set_mission_loiter_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], 50, waypointId)
+            # offset waypoint
+            else:
+                waypoint.set_mission_waypoint_with_offset(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, northing_offset)
 
         # Wait for final mission acknowledgment from autopilot
         msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)

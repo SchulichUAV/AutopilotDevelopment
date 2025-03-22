@@ -32,9 +32,9 @@ def set_waypoint(vehicle_connection, latitude, longitude, altitude, autocontinue
     except Exception as e:
         print(f"Error in function: set_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
 
-def create_mission_nav_waypoint(vehicle_connection, latitude, longitude, altitude, seq):
-    # PROMISES: Will return a MISSION_ITEM_INT message
-    # REQUIRES: a vehicle connection, latitude, longitude, altitude, an autocontinue flag, and a sequence number for the waypoint.
+def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, seq):
+    # PROMISES: Will attempt to send mission waypoint message
+    # REQUIRES: A vehicle connection, latitude, longitude, altitude, and a sequence number for the waypoint.
     try:
         mavlink_message = dialect.MAVLink_mission_item_int_message(
             target_system=vehicle_connection.target_system,
@@ -52,12 +52,25 @@ def create_mission_nav_waypoint(vehicle_connection, latitude, longitude, altitud
             y=int(longitude * 1e7), # longitude in degrees *10^7
             z=altitude # altitude [m] - relative or absolute depending on frame
         )
-        return mavlink_message
-
+        vehicle_connection.mav.send(mavlink_message)
+        print(f"Sent mission message for sequence number {seq}")
     except Exception as e:
         print(f"Error in function: set_mission_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
 
-def create_mission_loiter_waypoint(vehicle_connection, latitude, longitude, altitude, radius, seq):
+def set_mission_waypoint_with_offset(vehicle_connection, latitude, longitude, altitude, seq, northing_offset):
+    # PROMISES: Will attempt to send mission waypoint message
+    # REQUIRES: a vehicle connection, latitude, longitude, altitude, a sequence number for the waypoint, and a northing offset.
+
+    # 1 degree of latitude ~ 111,320 meters
+    lat_offset = northing_offset / 111320  
+    # Apply the northing offset
+    new_latitude = latitude + lat_offset
+    try:
+        set_mission_waypoint(vehicle_connection, new_latitude, longitude, altitude, seq)
+    except Exception as e:
+        print(f"Error in function: set_mission_waypoint() from file: Plane/Operations/waypoint.py -> {e}")    
+
+def set_mission_loiter_waypoint(vehicle_connection, latitude, longitude, altitude, radius, seq):
     # PROMISES: Will return a MISSION_ITEM_INT message
     # REQUIRES: a vehicle connection, latitude, longitude, altitude, waypoint radius, and a sequence number for the waypoint.
     try:
@@ -77,7 +90,8 @@ def create_mission_loiter_waypoint(vehicle_connection, latitude, longitude, alti
             y=int(longitude * 1e7), # longitude in degrees *10^7
             z=altitude # altitude [m] - relative or absolute depending on frame
         )
-        return mavlink_message
+        vehicle_connection.mav.send(mavlink_message)
+        print(f"Sent mission message for sequence number {seq}")
 
     except Exception as e:
         print(f"Error in function: set_mission_waypoint() from file: Plane/Operations/waypoint.py -> {e}")
