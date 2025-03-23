@@ -32,8 +32,6 @@ class suav(mp_module.MPModule):
         self.speed_uncertainty = 0
         self.heading_uncertainty = 0
 
-        self.flight_mode = 0
-
     def idle_task(self):
         '''called rapidly by mavproxy'''
         now = time.time()
@@ -65,9 +63,6 @@ class suav(mp_module.MPModule):
             elif m.get_type() == 'GPS_RAW_INT':
                 (num_satellites, position_uncertainty, alt_uncertainty, speed_uncertainty, heading_uncertainty) = (m.satellites_visible, 
                                                                                                                         m.h_acc, m.v_acc, m.vel_acc, m.hdg_acc)
-            elif m.get_type() == 'HEARTBEAT':
-                self.flight_mode = m.custom_mode
-
                 self.num_satellites = num_satellites # Number of visible satellites
                 self.position_uncertainty = position_uncertainty # Position uncertainty (mm)
                 self.alt_uncertainty = alt_uncertainty # Altitude uncertainty (mm)
@@ -77,7 +72,7 @@ class suav(mp_module.MPModule):
     def send_data(self):
         t = time.time()
         heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
-                        self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty, self.flight_mode)
+                        self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty)
         heartbeat_message = f"{heartbeat_data}".encode()
         self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
 
