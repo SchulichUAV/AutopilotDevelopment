@@ -59,21 +59,15 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     except Exception as e:
         print(f"Error in upload_mission_waypoints: {e}")
         return False
-    
-def start_distance_checking(drop_distance):
-    distance = monitor_waypoint.receive_wp().dist
+
+def start_distance_checking(vehicle_connection, drop_distance):
+    while 1:
+        msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
+        if msg is not None and msg.seq == 2:
+            break
+    distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
     while distance > drop_distance:
-        distance = monitor_waypoint.receive_wp().dist
+        distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
         time.sleep(0.25)        
     ### do drop
-
-'''
-
-call a waypoint function (x, y, z)
-
-
-
-
-
-
-'''
+    print("Dropping payload")
