@@ -1,5 +1,7 @@
 import pymavlink.dialects.v20.all as dialect
 import Plane.Operations.waypoint as waypoint
+import General.Operations.monitor_waypoint as monitor_waypoint
+import time
 
 northing_offset = 1000
 waypoint_radius = 50
@@ -57,3 +59,21 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     except Exception as e:
         print(f"Error in upload_mission_waypoints: {e}")
         return False
+    
+def start_distance_checking(drop_distance):
+    distance = monitor_waypoint.receive_wp().dist
+    while distance > drop_distance:
+        distance = monitor_waypoint.receive_wp().dist
+        time.sleep(0.25)        
+    ### do drop
+
+'''
+
+call a waypoint function (x, y, z)
+
+
+
+
+
+
+'''
