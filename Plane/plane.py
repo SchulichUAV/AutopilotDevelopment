@@ -71,6 +71,11 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
+    def start_payload_drop_mission(self, payload_object_coord, drop_distance):
+        mission.upload_payload_drop_mission(self.vehicle_connection, payload_object_coord)
+        plane_mode.set_mode(self.vehicle_connection, 10)
+        mission.start_distance_checking(self.vehicle_connection, drop_distance)
+
     def upload_payload_drop_mission(self, payload_object_coord):
         mission.upload_payload_drop_mission(self.vehicle_connection, payload_object_coord)
     
