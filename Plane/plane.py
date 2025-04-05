@@ -10,6 +10,7 @@ import General.Operations.initialize as plane_initialize
 import General.Operations.mode as plane_mode
 import General.Operations.speed as plane_speed
 import General.Operations.monitor_waypoint as plane_monitor_waypoint
+import General.Operations.mission as mission
 
 import Plane.Operations.system_state as plane_system_state
 import Plane.Operations.takeoff as plane_takeoff_config
@@ -70,6 +71,11 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
+    def upload_payload_drop_mission(self, payload_object_coord):
+        mission.upload_payload_drop_mission(self.vehicle_connection, payload_object_coord)
+    
+    def start_distance_checking(self, drop_distance):
+        mission.start_distance_checking(self.vehicle_connection, drop_distance)
     
 if __name__ == '__main__':
     ## establish connection to the plane
