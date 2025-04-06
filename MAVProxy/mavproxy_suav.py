@@ -26,6 +26,11 @@ class suav(mp_module.MPModule):
         self.dalt = 0
         self.heading = 0
 
+        self.airspeed = 0
+        self.groundspeed = 0
+        self.throttle = 0
+        self.climb = 0
+
         self.num_satellites = 0
         self.position_uncertainty = 0
         self.alt_uncertainty = 0
@@ -68,11 +73,17 @@ class suav(mp_module.MPModule):
                 self.alt_uncertainty = alt_uncertainty # Altitude uncertainty (mm)
                 self.speed_uncertainty = speed_uncertainty # Speed uncertainty (mm)
                 self.heading_uncertainty = heading_uncertainty # Heading uncertainty (mm)
+
+            elif m.get_type() == 'VFR_HUD':
+                self.airspeed = m.airspeed
+                self.groundspeed = m.groundspeed
+                self.throttle = m.throttle
+                self.climb = m.climb
             
     def send_data(self):
         t = time.time()
         heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
-                        self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty)
+                self.airspeed, self.groundspeed, self.throttle, self.climb, self.num_satellites, self.position_uncertainty, self.speed_uncertainty, self.heading_uncertainty)
         heartbeat_message = f"{heartbeat_data}".encode()
         self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
 
