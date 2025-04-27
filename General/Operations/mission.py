@@ -4,7 +4,7 @@ import General.Operations.monitor_waypoint as monitor_waypoint
 import time
 
 northing_offset = 1000
-waypoint_radius = 50
+waypoint_radius = 15
 
 def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
@@ -60,7 +60,7 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         print(f"Error in upload_mission_waypoints: {e}")
         return False
 
-def start_distance_checking(vehicle_connection, drop_distance):
+def check_distance_and_drop(vehicle_connection, drop_distance):
     while 1:
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
         if msg is not None and msg.seq == 2:
@@ -68,6 +68,6 @@ def start_distance_checking(vehicle_connection, drop_distance):
     distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
     while distance > drop_distance:
         distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
-        time.sleep(0.25)        
-    ### do drop
+        time.sleep(0.1)        
+    ### TODO 
     print("Dropping payload")

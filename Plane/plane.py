@@ -76,9 +76,6 @@ class Plane:
         plane_mode.set_mode(self.vehicle_connection, 10)
         mission.start_distance_checking(self.vehicle_connection, drop_distance)
 
-    def upload_payload_drop_mission(self, payload_object_coord):
-        mission.upload_payload_drop_mission(self.vehicle_connection, payload_object_coord)
-    
     def start_distance_checking(self, drop_distance):
         mission.start_distance_checking(self.vehicle_connection, drop_distance)
     
