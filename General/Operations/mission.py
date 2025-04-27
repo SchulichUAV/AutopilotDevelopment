@@ -69,5 +69,5 @@ def check_distance_and_drop(vehicle_connection, drop_distance):
     while distance > drop_distance:
         distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
         time.sleep(0.1)        
-    ### TODO 
+    ### TODO add code to drop payload
     print("Dropping payload")
