@@ -60,7 +60,7 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         print(f"Error in upload_mission_waypoints: {e}")
         return False
 
-def check_distance_and_drop(vehicle_connection, drop_distance):
+def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
     while 1:
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
         if msg is not None and msg.seq == 2:
@@ -74,6 +74,6 @@ def check_distance_and_drop(vehicle_connection, drop_distance):
         msg = vehicle_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=False, timeout=0.5)
         if (msg is not None and msg.seq == 2) or distance < drop_distance:
             ### TODO add code to drop payload
-            print("Dropping payload...")
+            print(f"Dropping payload for servo #{current_servo}")
             drop_done = True
         time.sleep(0.1)        
