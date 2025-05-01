@@ -65,9 +65,15 @@ def check_distance_and_drop(vehicle_connection, drop_distance):
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
         if msg is not None and msg.seq == 2:
             break
-    distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
-    while distance > drop_distance:
+
+    drop_done = False
+    while not drop_done:
         distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
+        print(distance)
+        
+        msg = vehicle_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=False, timeout=0.5)
+        if (msg is not None and msg.seq == 2) or distance < drop_distance:
+            ### TODO add code to drop payload
+            print("Dropping payload...")
+            drop_done = True
         time.sleep(0.1)        
-    ### TODO add code to drop payload
-    print("Dropping payload")
