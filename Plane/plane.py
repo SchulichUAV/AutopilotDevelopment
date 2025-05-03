@@ -80,7 +80,7 @@ class Plane:
         self.current_payload_servo += 1
     
     def request_and_receive_wind(self):
-        return wind.request_and_receive_winds(self.vehicle_connection)
+        return wind.request_and_receive_wind(self.vehicle_connection)
 
 if __name__ == '__main__':
     ## establish connection to the plane
