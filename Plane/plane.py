@@ -11,6 +11,7 @@ import General.Operations.mode as plane_mode
 import General.Operations.speed as plane_speed
 import General.Operations.monitor_waypoint as plane_monitor_waypoint
 import General.Operations.mission as mission
+import General.Operations.wind as wind
 
 import Plane.Operations.system_state as plane_system_state
 import Plane.Operations.takeoff as plane_takeoff_config
@@ -78,6 +79,9 @@ class Plane:
         mission.check_distance_and_drop(self.vehicle_connection, drop_distance, self.current_payload_servo)
         self.current_payload_servo += 1
     
+    def request_and_receive_wind_cov(self):
+        wind.request_and_receive_wind_cov(self.vehicle_connection)
+
 if __name__ == '__main__':
     ## establish connection to the plane
     plane = Plane(vehicle_connection='udpin:127.0.0.1:14550')
