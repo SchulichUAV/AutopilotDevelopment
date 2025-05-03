@@ -45,7 +45,7 @@ def set_mission_waypoint(vehicle_connection, latitude, longitude, altitude, seq)
             current=0, # Current should be set to 0 for missions, really only used for download
             autocontinue=0, # Ignored by ArduPlane, as fixed-wing aircraft continuously follow mission waypoints in and do not pause at waypoints.
             param1=0, # Ignored 
-            param2=0, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
+            param2=15, # Acceptance radius [m] (if sphere with this radius is hit, waypoint counts as reached) 
             param3=0, # Pass radius, 0 to pass through WP. if >0, will CW orbit, <0 will have CCW orbit [m]
             param4=0, # Ignored
             x=int(latitude * 1e7), # latitude in degrees *10^7
