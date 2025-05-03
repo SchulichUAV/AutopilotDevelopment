@@ -10,6 +10,7 @@ import General.Operations.initialize as plane_initialize
 import General.Operations.mode as plane_mode
 import General.Operations.speed as plane_speed
 import General.Operations.monitor_waypoint as plane_monitor_waypoint
+import General.Operations.mission as mission
 
 import Plane.Operations.system_state as plane_system_state
 import Plane.Operations.takeoff as plane_takeoff_config
@@ -18,6 +19,7 @@ import Plane.Operations.waypoint as plane_waypoint
 class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
         self.vehicle_connection, self.valid_connection = plane_initialize.connect_to_vehicle(vehicle_connection)
+        self.current_payload_servo = 1
         print(f"Connnected to vehicle at {vehicle_connection}")
 
     def arm_vehicle(self):
@@ -70,6 +72,11 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
+    def start_payload_drop_mission(self, payload_object_coord, drop_distance):
+        mission.upload_payload_drop_mission(self.vehicle_connection, payload_object_coord)
+        plane_mode.set_mode(self.vehicle_connection, 10)
+        mission.check_distance_and_drop(self.vehicle_connection, drop_distance, self.current_payload_servo)
+        self.current_payload_servo += 1
     
 if __name__ == '__main__':
     ## establish connection to the plane
