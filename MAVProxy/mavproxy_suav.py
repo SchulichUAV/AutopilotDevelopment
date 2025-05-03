@@ -36,6 +36,9 @@ class suav(mp_module.MPModule):
         self.alt_uncertainty = 0
         self.speed_uncertainty = 0
         self.heading_uncertainty = 0
+        self.wind_direction = 0
+        self.wind_speed = 0
+        self.wind_vertical_speed = 0
 
     def idle_task(self):
         '''called rapidly by mavproxy'''
@@ -79,12 +82,16 @@ class suav(mp_module.MPModule):
                 self.groundspeed = m.groundspeed
                 self.throttle = m.throttle
                 self.climb = m.climb
-            
+
+            elif m.get_type() == "WIND":
+                self.wind_direction = m.direction
+                self.wind_speed = m.speed
+                self.wind_vertical_speed = m.speed_z
     def send_data(self):
         t = time.time()
         heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
                 self.airspeed, self.groundspeed, self.throttle, self.climb, self.num_satellites, self.position_uncertainty, self.alt_uncertainty, self.speed_uncertainty, 
-                          self.heading_uncertainty, self.flight_mode)
+                          self.heading_uncertainty, self.flight_mode, self.wind_direction, self.wind_speed, self.wind_vertical_speed)
 
         heartbeat_message = f"{heartbeat_data}".encode()
         self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
