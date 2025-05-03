@@ -3,8 +3,8 @@ import pymavlink.dialects.v20.all as dialect
 import pymavlink.dialects.v20.all as dialect
 
 
-def request_and_receive_wind_cov(vehicle_connection, frequency_hz=1):
-    # PROMISES: Requests and receives WIND_COV message from the vehicle
+def request_and_receive_wind(vehicle_connection, frequency_hz=1):
+    # PROMISES: Requests and receives WIND message from the vehicle
     # REQUIRES: A MAVLink vehicle connection
 
     try:

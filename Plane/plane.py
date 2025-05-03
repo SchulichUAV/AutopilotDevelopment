@@ -79,8 +79,8 @@ class Plane:
         mission.check_distance_and_drop(self.vehicle_connection, drop_distance, self.current_payload_servo)
         self.current_payload_servo += 1
     
-    def request_and_receive_wind_cov(self):
-        wind.request_and_receive_wind_cov(self.vehicle_connection)
+    def request_and_receive_wind(self):
+        return wind.request_and_receive_winds(self.vehicle_connection)
 
 if __name__ == '__main__':
     ## establish connection to the plane
