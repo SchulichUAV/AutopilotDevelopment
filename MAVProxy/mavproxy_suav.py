@@ -37,6 +37,8 @@ class suav(mp_module.MPModule):
         self.speed_uncertainty = 0
         self.heading_uncertainty = 0
 
+        self.flight_mode = 0
+
     def idle_task(self):
         '''called rapidly by mavproxy'''
         now = time.time()
@@ -60,6 +62,7 @@ class suav(mp_module.MPModule):
                 self.dlon = dlon # Ground y Speed (Longitude, positive east)
                 self.dalt = dalt # Ground Z speed (Altitude, postive down)
                 self.heading = heading # Vehicle heading, yaw angle
+            
             elif m.get_type() == 'ATTITUDE':
                 (roll, pitch, yaw) = (m.roll, m.pitch, m.yaw)
                 self.roll = roll # Roll (-pi, pi)
@@ -79,6 +82,9 @@ class suav(mp_module.MPModule):
                 self.groundspeed = m.groundspeed
                 self.throttle = m.throttle
                 self.climb = m.climb
+            
+            elif m.get_type() == 'HEARTBEAT':
+                self.flight_mode = m.custom_mode
             
     def send_data(self):
         t = time.time()
