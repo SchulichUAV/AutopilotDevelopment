@@ -1,6 +1,6 @@
 import pymavlink.dialects.v20.all as dialect
-import Plane.Operations.waypoint as waypoint
-import General.Operations.monitor_waypoint as monitor_waypoint
+import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
+import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
 import time
 
 northing_offset = 1000
