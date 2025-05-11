@@ -1,6 +1,5 @@
 import socket
 import time
-import math
 
 from MAVProxy.modules.lib import mp_module
 
@@ -70,9 +69,10 @@ class suav(mp_module.MPModule):
             
             elif m.get_type() == 'ATTITUDE':
                 (roll, pitch, yaw) = (m.roll, m.pitch, m.yaw)
-                self.roll = roll * 180 / math.pi # Roll (-pi, pi)
-                self.pitch = pitch * 180 / math.pi # Pitch (-pi, pi)
-                self.yaw = yaw * 180 / math.pi # Yaw (-pi, pi)
+                self.roll = roll # Roll in rads (-pi, pi)
+                self.pitch = pitch # Pitch in rads (-pi, pi)
+                self.yaw = yaw # Yaw in rads (-pi, pi)
+                
             elif m.get_type() == 'GPS_RAW_INT':
                 (num_satellites, position_uncertainty, alt_uncertainty, speed_uncertainty, heading_uncertainty) = (m.satellites_visible, 
                                                                                                                         m.h_acc, m.v_acc, m.vel_acc, m.hdg_acc)
