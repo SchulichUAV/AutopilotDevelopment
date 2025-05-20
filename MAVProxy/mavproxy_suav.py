@@ -98,7 +98,7 @@ class suav(mp_module.MPModule):
             
     def send_data(self):
         t = time.time()
-        heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
+        heartbeat_data = (t, self.lat, self.lon, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
                 self.airspeed, self.groundspeed, self.throttle, self.climb, self.num_satellites, self.position_uncertainty, self.alt_uncertainty, self.speed_uncertainty, 
                           self.heading_uncertainty, self.flight_mode, self.battery_voltage, self.battery_current, self.battery_remaining)
 
