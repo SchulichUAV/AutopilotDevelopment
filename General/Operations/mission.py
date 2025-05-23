@@ -1,10 +1,25 @@
 import pymavlink.dialects.v20.all as dialect
-import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
-import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
+import Plane.Operations.waypoint as waypoint
+import General.Operations.monitor_waypoint as monitor_waypoint
 import time
+import json
+import sys
+import os
 
 northing_offset = 1000
 waypoint_radius = 15
+altitude = 18
+
+def read_mission_json():
+
+    base_dir = os.path.dirname(__file__)
+    file_path = os.path.join(base_dir, "missionWaypoint.json")
+
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+
+    return data.get("waypoints", {})
+
 
 def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
@@ -15,7 +30,10 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # - The function will block until all waypoints are uploaded or a failure occurs.
 
     try:
-        count = 3
+        data = read_mission_json()
+        entry = data.get("entry")
+        exit = data.get("exit")
+        count = 4
         # Begin mission upload
         mission_count_msg = dialect.MAVLink_mission_count_message(
             target_system=vehicle_connection.target_system,
@@ -40,12 +58,20 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
 
             print(f"Sending waypoint {waypointId}")
 
+            # entry waypoint
+            if waypointId == 1:
+                print("waypoint 1")
+                print(entry)
+                waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], altitude, waypointId)
             # payload waypoint
-            if waypointId == 2:
-                waypoint.set_mission_loiter_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypoint_radius, waypointId)
-            # offset waypoint
+            elif waypointId == 2:
+                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId)
+            # exit waypoint
+            elif waypointId == 3:
+                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], altitude, waypoint_radius, waypointId)
+            # Handle sequence number 0, which is ignored by the autopilot
             else:
-                waypoint.set_mission_waypoint_with_offset(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, northing_offset)
+                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId)
 
         # Wait for final mission acknowledgment from autopilot
         msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
