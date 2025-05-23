@@ -1,6 +1,7 @@
 import pymavlink.dialects.v20.all as dialect
 import Plane.Operations.waypoint as waypoint
 import General.Operations.monitor_waypoint as monitor_waypoint
+import General.Operations.speed as speed
 import time
 import json
 import sys
@@ -60,8 +61,6 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
 
             # entry waypoint
             if waypointId == 1:
-                print("waypoint 1")
-                print(entry)
                 waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], altitude, waypointId)
             # payload waypoint
             elif waypointId == 2:
@@ -90,6 +89,7 @@ def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
     while 1:
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
         if msg is not None and msg.seq == 2:
+            speed.set_min_cruise_speed(vehicle_connection)
             break
 
     drop_done = False
@@ -103,3 +103,5 @@ def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
             print(f"Dropping payload for servo #{current_servo}")
             drop_done = True
         time.sleep(0.1)        
+    speed.set_max_cruise_speed(vehicle_connection)
+
