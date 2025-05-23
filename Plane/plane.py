@@ -21,7 +21,9 @@ class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
         self.vehicle_connection, self.valid_connection = plane_initialize.connect_to_vehicle(vehicle_connection)
         self.current_payload_servo = 1
-        print(f"Connnected to vehicle at {vehicle_connection}")
+        self.set_min_speed_param()
+        self.set_max_speed_param()
+        print(f"Connected to vehicle at {vehicle_connection}")
 
     def arm_vehicle(self):
         plane_arm.arm(self.vehicle_connection)
@@ -31,6 +33,12 @@ class Plane:
 
     def set_speed(self, speed_input):
         plane_speed.set_cruise_speed(self.vehicle_connection, speed_input)
+
+    def set_min_speed_param(self):
+        plane_speed.set_min_speed_param(self.vehicle_connection)
+
+    def set_max_speed_param(self):
+        plane_speed.set_max_speed_param(self.vehicle_connection)
 
     def get_waypoint_data(self):
         plane_monitor_waypoint.receive_wp(self.vehicle_connection)
