@@ -9,7 +9,7 @@ import os
 
 northing_offset = 1000
 waypoint_radius = 15
-altitude = 18
+altitude = 25
 
 def read_mission_json():
 
