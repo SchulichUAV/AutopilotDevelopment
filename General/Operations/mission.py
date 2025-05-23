@@ -10,17 +10,20 @@ import os
 northing_offset = 1000
 waypoint_radius = 15
 altitude = 25
+default_speed = 20
 
 def read_mission_json():
-
     base_dir = os.path.dirname(__file__)
-    file_path = os.path.join(base_dir, "missionWaypoint.json")
+    file_path = os.path.join(base_dir, "missionInformation.json")
 
     with open(file_path, 'r') as file:
         data = json.load(file)
 
-    return data.get("waypoints", {})
+    return data
 
+def drop_distance_json():
+    data = read_mission_json()
+    return data["drop_distance"]
 
 def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
@@ -32,8 +35,9 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
 
     try:
         data = read_mission_json()
-        entry = data.get("entry")
-        exit = data.get("exit")
+        waypoints = data.get("waypoints", {})
+        entry = waypoints.get("entry")
+        exit = waypoints.get("exit")
         count = 4
         # Begin mission upload
         mission_count_msg = dialect.MAVLink_mission_count_message(
@@ -85,7 +89,8 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         print(f"Error in upload_mission_waypoints: {e}")
         return False
 
-def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
+def check_distance_and_drop(vehicle_connection, current_servo):
+    drop_distance = drop_distance_json()
     while 1:
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
         if msg is not None and msg.seq == 2:
@@ -103,5 +108,5 @@ def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
             print(f"Dropping payload for servo #{current_servo}")
             drop_done = True
         time.sleep(0.1)        
-    speed.set_max_cruise_speed(vehicle_connection)
+    speed.set_cruise_speed(vehicle_connection, default_speed)
 
