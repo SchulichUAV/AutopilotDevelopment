@@ -72,18 +72,8 @@ class suav(mp_module.MPModule):
                 self.roll = roll # Roll in rads (-pi, pi)
                 self.pitch = pitch # Pitch in rads (-pi, pi)
                 self.yaw = yaw # Yaw in rads (-pi, pi)
-                
-            elif m.get_type() == 'GPS_RAW_INT':
-                (num_satellites, position_uncertainty, alt_uncertainty, speed_uncertainty, heading_uncertainty) = (m.satellites_visible, 
-                                                                                                                        m.h_acc, m.v_acc, m.vel_acc, m.hdg_acc)
-                self.num_satellites = num_satellites # Number of visible satellites
-                self.position_uncertainty = position_uncertainty # Position uncertainty (mm)
-                self.alt_uncertainty = alt_uncertainty # Altitude uncertainty (mm)
-                self.speed_uncertainty = speed_uncertainty # Speed uncertainty (mm)
-                self.heading_uncertainty = heading_uncertainty # Heading uncertainty (mm)
 
             elif m.get_type() == 'VFR_HUD':
-                self.airspeed = m.airspeed
                 self.groundspeed = m.groundspeed
                 self.throttle = m.throttle
                 self.climb = m.climb
@@ -99,8 +89,7 @@ class suav(mp_module.MPModule):
     def send_data(self):
         t = time.time()
         heartbeat_data = (t, self.lat, self.lon, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
-                self.airspeed, self.groundspeed, self.throttle, self.climb, self.num_satellites, self.position_uncertainty, self.alt_uncertainty, self.speed_uncertainty, 
-                          self.heading_uncertainty, self.flight_mode, self.battery_voltage, self.battery_current, self.battery_remaining)
+                self.groundspeed, self.throttle, self.climb,  self.flight_mode, self.battery_voltage, self.battery_current, self.battery_remaining)
 
         heartbeat_message = f"{heartbeat_data}".encode()
         self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
