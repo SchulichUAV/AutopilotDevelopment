@@ -5,12 +5,12 @@ import os
 script_dir = os.path.abspath('./..')
 sys.path.append(script_dir)
 
-import General.Operations.arm as plane_arm
-import General.Operations.initialize as plane_initialize
-import General.Operations.mode as plane_mode
-import General.Operations.speed as plane_speed
-import General.Operations.monitor_waypoint as plane_monitor_waypoint
-import General.Operations.mission as mission
+import modules.AutopilotDevelopment.General.Operations.arm as plane_arm
+import modules.AutopilotDevelopment.General.Operations.initialize as plane_initialize
+import modules.AutopilotDevelopment.General.Operations.mode as plane_mode
+import modules.AutopilotDevelopment.General.Operations.speed as plane_speed
+import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as plane_monitor_waypoint
+import modules.AutopilotDevelopment.General.Operations.mission as mission
 
 import Plane.Operations.system_state as plane_system_state
 import Plane.Operations.takeoff as plane_takeoff_config

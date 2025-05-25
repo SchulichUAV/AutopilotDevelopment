@@ -2,11 +2,11 @@ import sys
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-import General.Operations.arm as arm
-import General.Operations.initialize as initialize
-import General.Operations.mode as mode
-import Copter.Operations.takeoff as takeoff
-import Copter.Operations.waypoint as waypoint
+import modules.AutopilotDevelopment.General.Operations.arm as arm
+import modules.AutopilotDevelopment.General.Operations.initialize as initialize
+import modules.AutopilotDevelopment.General.Operations.mode as mode
+import modules.AutopilotDevelopment.Copter.Operations.takeoff as takeoff
+import modules.AutopilotDevelopment.Copter.Operations.waypoint as waypoint
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}) # Overriding CORS for external access
