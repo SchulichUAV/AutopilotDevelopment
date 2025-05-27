@@ -66,13 +66,10 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
             # entry waypoint
             if waypointId == 1:
                 waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], altitude, waypointId)
-            # payload waypoint
-            elif waypointId == 2:
-                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId)
             # exit waypoint
             elif waypointId == 3:
                 waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], altitude, waypoint_radius, waypointId)
-            # Handle sequence number 0, which is ignored by the autopilot
+            # Payload waypoint and seq 0 waypoint, which is ignored by the autopilot
             else:
                 waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId)
 
