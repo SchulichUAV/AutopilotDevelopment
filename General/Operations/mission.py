@@ -13,17 +13,27 @@ altitude = 25
 default_speed = 20
 
 def read_mission_json():
-    base_dir = os.path.dirname(__file__)
-    file_path = os.path.join(base_dir, "missionInformation.json")
+    try:
+        base_dir = os.path.dirname(__file__)
+        file_path = os.path.join(base_dir, "missionInformation.json")
 
-    with open(file_path, 'r') as file:
-        data = json.load(file)
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Mission file not found at {file_path}")
 
-    return data
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+
+        return data
+
+    except Exception as e:
+        raise ValueError("Failed to read mission JSON")
 
 def drop_distance_json():
-    data = read_mission_json()
-    return data["drop_distance"]
+    try:
+        data = read_mission_json()
+        return data["drop_distance"]
+    except Exception as e:
+        raise ValueError("Failed to read drop distance")
 
 def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
@@ -38,6 +48,11 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         waypoints = data.get("waypoints", {})
         entry = waypoints.get("entry")
         exit = waypoints.get("exit")
+
+        if entry is None or exit is None:
+            print("Missing 'entry' or 'exit' waypoint in mission file.")
+            return
+
         count = 4
         # Begin mission upload
         mission_count_msg = dialect.MAVLink_mission_count_message(
