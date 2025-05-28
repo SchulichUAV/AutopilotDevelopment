@@ -2,6 +2,7 @@ import pymavlink.dialects.v20.all as dialect
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
 import modules.AutopilotDevelopment.General.Operations.speed as speed
+import modules.payload as payload
 import time
 import json
 import sys
@@ -101,7 +102,7 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         print(f"Error in upload_mission_waypoints: {e}")
         return False
 
-def check_distance_and_drop(vehicle_connection, current_servo):
+def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data):
     drop_distance = drop_distance_json()
     while 1:
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
@@ -116,7 +117,7 @@ def check_distance_and_drop(vehicle_connection, current_servo):
         
         msg = vehicle_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=False, timeout=0.5)
         if (msg is not None and msg.seq == 2) or distance < drop_distance:
-            ### TODO add code to drop payload
+            payload.payload_release(kit, current_servo, vehicle_data)
             print(f"Dropping payload for servo #{current_servo}")
             drop_done = True
         time.sleep(0.1)        
