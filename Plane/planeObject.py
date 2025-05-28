@@ -12,9 +12,9 @@ import modules.AutopilotDevelopment.General.Operations.speed as plane_speed
 import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as plane_monitor_waypoint
 import modules.AutopilotDevelopment.General.Operations.mission as mission
 
-import Plane.Operations.system_state as plane_system_state
-import Plane.Operations.takeoff as plane_takeoff_config
-import Plane.Operations.waypoint as plane_waypoint
+import modules.AutopilotDevelopment.Plane.Operations.system_state as plane_system_state
+import modules.AutopilotDevelopment.Plane.Operations.takeoff as plane_takeoff_config
+import modules.AutopilotDevelopment.Plane.Operations.waypoint as plane_waypoint
 
 class Plane:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
@@ -72,10 +72,10 @@ class Plane:
     def set_rtl_radius(self, rtl_loiter_radius):
         plane_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
 
-    def start_payload_drop_mission(self, payload_object_coord, drop_distance):
+    def start_payload_drop_mission(self, payload_object_coord):
         mission.upload_payload_drop_mission(self.vehicle_connection, payload_object_coord)
         plane_mode.set_mode(self.vehicle_connection, 10)
-        mission.check_distance_and_drop(self.vehicle_connection, drop_distance, self.current_payload_servo)
+        mission.check_distance_and_drop(self.vehicle_connection, self.current_payload_servo)
         self.current_payload_servo += 1
     
 if __name__ == '__main__':

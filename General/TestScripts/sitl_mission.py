@@ -15,4 +15,4 @@ object_location = [-35.3634185, 149.1604543, 50]
 
 mission.upload_payload_drop_mission(vehicle_connection, object_location)
 mode.set_mode(vehicle_connection, 10)
-mission.check_distance_and_drop(vehicle_connection, 95, 1)
+mission.check_distance_and_drop(vehicle_connection, 1)

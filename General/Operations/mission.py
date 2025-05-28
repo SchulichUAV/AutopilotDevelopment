@@ -1,10 +1,39 @@
 import pymavlink.dialects.v20.all as dialect
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
+import modules.AutopilotDevelopment.General.Operations.speed as speed
 import time
+import json
+import sys
+import os
 
 northing_offset = 1000
 waypoint_radius = 15
+altitude = 25
+default_speed = 20
+
+def read_mission_json():
+    try:
+        base_dir = os.path.dirname(__file__)
+        file_path = os.path.join(base_dir, "missionInformation.json")
+
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Mission file not found at {file_path}")
+
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+
+        return data
+
+    except Exception as e:
+        raise ValueError("Failed to read mission JSON")
+
+def drop_distance_json():
+    try:
+        data = read_mission_json()
+        return data["drop_distance"]
+    except Exception as e:
+        raise ValueError("Failed to read drop distance")
 
 def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
@@ -15,7 +44,16 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
     # - The function will block until all waypoints are uploaded or a failure occurs.
 
     try:
-        count = 3
+        data = read_mission_json()
+        waypoints = data.get("waypoints", {})
+        entry = waypoints.get("entry")
+        exit = waypoints.get("exit")
+
+        if entry is None or exit is None:
+            print("Missing 'entry' or 'exit' waypoint in mission file.")
+            return
+
+        count = 4
         # Begin mission upload
         mission_count_msg = dialect.MAVLink_mission_count_message(
             target_system=vehicle_connection.target_system,
@@ -40,12 +78,15 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
 
             print(f"Sending waypoint {waypointId}")
 
-            # payload waypoint
-            if waypointId == 2:
-                waypoint.set_mission_loiter_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypoint_radius, waypointId)
-            # offset waypoint
+            # entry waypoint
+            if waypointId == 1:
+                waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], altitude, waypointId)
+            # exit waypoint
+            elif waypointId == 3:
+                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], altitude, waypoint_radius, waypointId)
+            # Payload waypoint and seq 0 waypoint, which is ignored by the autopilot
             else:
-                waypoint.set_mission_waypoint_with_offset(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, northing_offset)
+                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId)
 
         # Wait for final mission acknowledgment from autopilot
         msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
@@ -60,10 +101,12 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         print(f"Error in upload_mission_waypoints: {e}")
         return False
 
-def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
+def check_distance_and_drop(vehicle_connection, current_servo):
+    drop_distance = drop_distance_json()
     while 1:
         msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
         if msg is not None and msg.seq == 2:
+            speed.set_min_cruise_speed(vehicle_connection)
             break
 
     drop_done = False
@@ -77,3 +120,5 @@ def check_distance_and_drop(vehicle_connection, drop_distance, current_servo):
             print(f"Dropping payload for servo #{current_servo}")
             drop_done = True
         time.sleep(0.1)        
+    speed.set_cruise_speed(vehicle_connection, default_speed)
+

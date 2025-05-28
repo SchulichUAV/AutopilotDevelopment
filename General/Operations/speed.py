@@ -8,26 +8,27 @@
 from pymavlink import mavutil
 import modules.AutopilotDevelopment.General.Operations.initialize as initialize
 
-vehicle_connection, valid_connection= initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
+max_speed = 90 / 3.6 # 90 km/h converted to m/s
+min_speed = 60 / 3.6 # 60 km/h converted to m/s
 
-max_speed = 55 / 3.6 # 55 km/h converted to m/s
-min_speed = 40 / 3.6 # 40 km/h converted to m/s
 
-vehicle_connection.mav.param_set_send(
-        target_system=vehicle_connection.target_system,
-        target_component=vehicle_connection.target_component,
-        param_id=b'AIRSPEED_MAX',
-        param_value=max_speed,
-        param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
-    )
+def set_min_speed_param(vehicle_connection):
+    vehicle_connection.mav.param_set_send(
+            target_system=vehicle_connection.target_system,
+            target_component=vehicle_connection.target_component,
+            param_id=b'AIRSPEED_MIN',
+            param_value=min_speed,
+            param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
+        )
 
-vehicle_connection.mav.param_set_send(
-        target_system=vehicle_connection.target_system,
-        target_component=vehicle_connection.target_component,
-        param_id=b'AIRSPEED_MIN',
-        param_value=min_speed,
-        param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
-    )
+def set_max_speed_param(vehicle_connection):
+    vehicle_connection.mav.param_set_send(
+            target_system=vehicle_connection.target_system,
+            target_component=vehicle_connection.target_component,
+            param_id=b'AIRSPEED_MAX',
+            param_value=max_speed,
+            param_type=mavutil.mavlink.MAV_PARAM_TYPE_UINT32
+        )
 
 def check_valid_speed(speed):
     #PROMISES: Returns 1 if the speed value is not between the max and min values
@@ -71,6 +72,12 @@ def set_guided_airspeed(vehicle_connection, speed, throttle=-1):
         print(msg)
     except Exception as e:
         print(f"Error in function: change_speed() from file: General/Operations/speed.py -> {e}")
+
+def set_min_cruise_speed(vehicle_connection):
+    set_cruise_speed(vehicle_connection, min_speed)
+
+def set_max_cruise_speed(vehicle_connection):
+    set_cruise_speed(vehicle_connection, max_speed)
 
 def set_cruise_speed(vehicle_connection, speed):
     # PROMISES: Sets fixed-wing vehicle speed in m/s
