@@ -113,7 +113,8 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
             msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
             if msg is not None and msg.seq == 2:
                 try:
-                    speed.set_min_cruise_speed(vehicle_connection)
+                    print(f"Setting cruise speed to minimum for drop.")
+                    # speed.set_min_cruise_speed(vehicle_connection)
                 except Exception as e:
                     print(f"[Error] Failed to set min cruise speed: {e}")
                 break
@@ -152,7 +153,7 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
 
     try:
         print(f"Setting cruise speed back to {default_speed} m/s")
-        speed.set_cruise_speed(vehicle_connection, default_speed)
+        # speed.set_cruise_speed(vehicle_connection, default_speed)
     except Exception as e:
         print(f"[Error] Failed to reset cruise speed: {e}")
     finally:
