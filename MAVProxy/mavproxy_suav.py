@@ -17,9 +17,9 @@ class suav(mp_module.MPModule):
         self.rel_alt = 0
         self.alt = 0
 
+        self.roll = 0
         self.pitch = 0
         self.yaw = 0
-        self.roll = 0
 
         self.dlat = 0
         self.dlon = 0
@@ -71,8 +71,7 @@ class suav(mp_module.MPModule):
                 self.yaw = yaw # Yaw in rads (-pi, pi)
                 
             elif m.get_type() == 'GPS_RAW_INT':
-                (num_satellites, position_uncertainty, alt_uncertainty, speed_uncertainty, heading_uncertainty) = (m.satellites_visible, 
-                                                                                                                        m.h_acc, m.v_acc)
+                (num_satellites, position_uncertainty, alt_uncertainty) = (m.satellites_visible, m.h_acc, m.v_acc)
                 self.num_satellites = num_satellites # Number of visible satellites
                 self.position_uncertainty = position_uncertainty # Position uncertainty (mm)
                 self.alt_uncertainty = alt_uncertainty # Altitude uncertainty (mm)
