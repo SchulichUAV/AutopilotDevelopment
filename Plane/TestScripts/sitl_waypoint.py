@@ -4,9 +4,9 @@ import os
 script_dir = os.path.abspath('./../..')
 sys.path.append(script_dir)
 
-import General.Operations.initialize as initialize
-import General.Operations.mode as mode
-import Plane.Operations.waypoint as waypoint
+import modules.AutopilotDevelopment.General.Operations.initialize as initialize
+import modules.AutopilotDevelopment.General.Operations.mode as mode
+import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 
 vehicle_connection, valid_connection = initialize.connect_to_vehicle('udpin:127.0.0.1:14550')
 

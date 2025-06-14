@@ -1,7 +1,8 @@
 import pymavlink.dialects.v20.all as dialect
-import Plane.Operations.waypoint as waypoint
-import General.Operations.monitor_waypoint as monitor_waypoint
-import General.Operations.speed as speed
+import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
+import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
+import modules.AutopilotDevelopment.General.Operations.speed as speed
+import modules.payload as payload
 import time
 import json
 import sys
@@ -9,7 +10,7 @@ import os
 
 northing_offset = 1000
 waypoint_radius = 15
-altitude = 25
+drop_waypoint_radius = 1
 default_speed = 20
 
 def read_mission_json():
@@ -80,13 +81,13 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
 
             # entry waypoint
             if waypointId == 1:
-                waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], altitude, waypointId)
+                waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], payload_object_coord[2], waypointId, waypoint_radius)
             # exit waypoint
             elif waypointId == 3:
-                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], altitude, waypoint_radius, waypointId)
+                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], payload_object_coord[2], waypoint_radius, waypointId)
             # Payload waypoint and seq 0 waypoint, which is ignored by the autopilot
             else:
-                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId)
+                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, drop_waypoint_radius)
 
         # Wait for final mission acknowledgment from autopilot
         msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
@@ -101,24 +102,60 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         print(f"Error in upload_mission_waypoints: {e}")
         return False
 
-def check_distance_and_drop(vehicle_connection, current_servo):
-    drop_distance = drop_distance_json()
-    while 1:
-        msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
-        if msg is not None and msg.seq == 2:
-            speed.set_min_cruise_speed(vehicle_connection)
-            break
+def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data):
+    try:
+        drop_distance = drop_distance_json()
+    except Exception as e:
+        print(f"[Error] Failed to load drop distance config: {e}")
+        return
+
+    try:
+        while True:
+            msg = vehicle_connection.recv_match(type='MISSION_CURRENT', blocking=False, timeout=5)
+            if msg is not None and msg.seq == 2:
+                try:
+                    print(f"Setting cruise speed to minimum for drop.")
+                    # speed.set_min_cruise_speed(vehicle_connection)
+                except Exception as e:
+                    print(f"[Error] Failed to set min cruise speed: {e}")
+                break
+    except Exception as e:
+        print(f"[Error] Failed during MISSION_CURRENT check: {e}")
+        return
 
     drop_done = False
-    while not drop_done:
-        distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
-        print(distance)
-        
-        msg = vehicle_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=False, timeout=0.5)
-        if (msg is not None and msg.seq == 2) or distance < drop_distance:
-            ### TODO add code to drop payload
-            print(f"Dropping payload for servo #{current_servo}")
-            drop_done = True
-        time.sleep(0.1)        
-    speed.set_cruise_speed(vehicle_connection, default_speed)
+    try:
+        while not drop_done:
+            try:
+                distance = monitor_waypoint.receive_wp(vehicle_connection).wp_dist
+                print(f"[Debug] Waypoint distance: {distance}")
+            except Exception as e:
+                print(f"[Error] Failed to get waypoint distance: {e}")
+                break
 
+            try:
+                msg = vehicle_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=False, timeout=0.5)
+            except Exception as e:
+                print(f"[Warning] Failed to read MISSION_ITEM_REACHED: {e}")
+                msg = None
+
+            if (msg is not None and msg.seq == 2) or distance < drop_distance:
+                try:
+                    payload.payload_release(kit, current_servo, vehicle_data)
+                    print(f"Dropping payload for servo #{current_servo}")
+                except Exception as e:
+                    print(f"[Error] Failed to release payload: {e}")
+                drop_done = True
+
+            time.sleep(0.1)
+    except Exception as e:
+        print(f"[Error] Failed during drop distance monitoring loop: {e}")
+        return
+
+    try:
+        print(f"Setting cruise speed back to {default_speed} m/s")
+        # speed.set_cruise_speed(vehicle_connection, default_speed)
+    except Exception as e:
+        print(f"[Error] Failed to reset cruise speed: {e}")
+    finally:
+        print(f"[Thread] Payload drop thread for bay {current_servo + 1} exited")

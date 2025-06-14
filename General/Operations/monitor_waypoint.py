@@ -4,7 +4,7 @@ import os
 script_dir = os.path.abspath('./../..')
 sys.path.append(script_dir)
 
-import General.Operations.initialize as initialize
+import modules.AutopilotDevelopment.General.Operations.initialize as initialize
 
 
 def receive_wp(vehicle_connection):

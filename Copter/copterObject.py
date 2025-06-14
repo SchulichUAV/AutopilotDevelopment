@@ -5,15 +5,15 @@ import os
 script_dir = os.path.abspath('./..')
 sys.path.append(script_dir)
 
-import General.Operations.arm as copter_arm
-import General.Operations.battery_data as copter_battery_data
-import General.Operations.initialize as copter_initialize
-import General.Operations.mode as copter_mode
-import General.Operations.speed as copter_speed
-import General.Operations.monitor_waypoint as copter_monitor_waypoint
+import modules.AutopilotDevelopment.General.Operations.arm as copter_arm
+import modules.AutopilotDevelopment.General.Operations.battery_data as copter_battery_data
+import modules.AutopilotDevelopment.General.Operations.initialize as copter_initialize
+import modules.AutopilotDevelopment.General.Operations.mode as copter_mode
+import modules.AutopilotDevelopment.General.Operations.speed as copter_speed
+import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as copter_monitor_waypoint
 
-import Copter.Operations.takeoff as copter_takeoff
-import Copter.Operations.waypoint as copter_waypoint
+import modules.AutopilotDevelopment.Copter.Operations.takeoff as copter_takeoff
+import modules.AutopilotDevelopment.Copter.Operations.waypoint as copter_waypoint
 
 class Copter:
     def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
