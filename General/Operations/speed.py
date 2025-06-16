@@ -6,7 +6,7 @@
 #TODO: Conduct safety checks with physical vehicle [IMPORTANT!]
 
 from pymavlink import mavutil
-import General.Operations.initialize as initialize
+import modules.AutopilotDevelopment.General.Operations.initialize as initialize
 
 max_speed = 90 / 3.6 # 90 km/h converted to m/s
 min_speed = 60 / 3.6 # 60 km/h converted to m/s
