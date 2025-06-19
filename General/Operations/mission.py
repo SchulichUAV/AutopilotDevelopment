@@ -16,7 +16,10 @@ default_speed = 18
 def read_mission_json():
     try:
         base_dir = os.path.dirname(__file__)
-        file_path = os.path.join(base_dir, "airdrie.json")
+        file_path = os.path.join(base_dir, "airdrie.json") # Airdrie Flying Club
+        # file_path = os.path.join(base_dir, "zone1.json") # Competition - zone 1 (left side, west end of runway)
+        # file_path = os.path.join(base_dir, "zone2.json") # Competition - zone 2 (right side, east end of runway)
+        
 
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Mission file not found at {file_path}")
