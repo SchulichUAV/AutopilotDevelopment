@@ -11,12 +11,12 @@ import os
 northing_offset = 1000
 waypoint_radius = 15
 drop_waypoint_radius = 1
-default_speed = 20
+default_speed = 18
 
 def read_mission_json():
     try:
         base_dir = os.path.dirname(__file__)
-        file_path = os.path.join(base_dir, "missionInformation.json")
+        file_path = os.path.join(base_dir, "airdrie.json")
 
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Mission file not found at {file_path}")
@@ -82,12 +82,18 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
             # entry waypoint
             if waypointId == 1:
                 waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], payload_object_coord[2], waypointId, waypoint_radius)
+            
+            # drop waypoint
+            elif waypointId == 2:
+                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, drop_waypoint_radius)
+            
             # exit waypoint
             elif waypointId == 3:
                 waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], payload_object_coord[2], waypoint_radius, waypointId)
+            
             # Payload waypoint and seq 0 waypoint, which is ignored by the autopilot
             else:
-                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, drop_waypoint_radius)
+                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, waypoint_radius)
 
         # Wait for final mission acknowledgment from autopilot
         msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
