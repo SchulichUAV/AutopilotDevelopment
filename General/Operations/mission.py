@@ -12,6 +12,7 @@ northing_offset = 1000
 waypoint_radius = 15
 drop_waypoint_radius = 1
 default_speed = 18
+loiter_radius = 40
 
 def read_mission_json():
     try:
@@ -92,7 +93,7 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
             
             # exit waypoint
             elif waypointId == 3:
-                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], payload_object_coord[2], waypoint_radius, waypointId)
+                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], payload_object_coord[2], loiter_radius, waypointId)
             
             # Payload waypoint and seq 0 waypoint, which is ignored by the autopilot
             else:
