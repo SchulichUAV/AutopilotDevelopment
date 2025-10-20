@@ -62,14 +62,6 @@ def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading)
     return lowestCost, bestSequence
 
 
-def best_start_point(waypoints: list, currentPoint: list):
-    """
-    Given waypoints and current position find best start waypoint
-    """
-    #TODO: impliment function 
-    return waypoints[0]
-
-
 def calculate_cost(currentPoint, point, currentHeading):
     """calculate the cost of flying from the current point to the next point"""
     return 0
