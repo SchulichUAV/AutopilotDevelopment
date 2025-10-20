@@ -153,7 +153,8 @@ def upload_mission_waypoints(vehicle_connection):
 
             print(f"Sending waypoint {waypointId}")
 
-            upload_wp = waypoints.get(waypointId) # assumes that waypoints are named with an id number, may be changed later
+            # assumes that waypoints are named with an id number, may be changed later
+            upload_wp = waypoints.get(str(waypointId))
 
             # waypoint 0 - ignored by autopilot
             if waypointId == 0:
