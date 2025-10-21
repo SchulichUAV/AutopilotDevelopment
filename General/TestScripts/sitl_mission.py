@@ -14,7 +14,9 @@ vehicle_connection = initialize.connect_to_vehicle('udpin:172.18.192.1:14550')
 object_location = [51.25996053, -113.9266562, 20]
 
 # mission.upload_payload_drop_mission(vehicle_connection, object_location)
-mission.upload_mission_waypoints(vehicle_connection)
-print("Will need to manually put into AUTO mode...")
-input("Press Enter to begin distance check and payload drop...")
-mission.check_distance_and_drop(vehicle_connection, 1)
+wp = mission.read_mission_json().get("waypoints")
+print(wp, len(wp))
+mission.upload_mission_waypoints(vehicle_connection, wp)
+# print("Will need to manually put into AUTO mode...")
+# input("Press Enter to begin distance check and payload drop...")
+# mission.check_distance_and_drop(vehicle_connection, 1)
