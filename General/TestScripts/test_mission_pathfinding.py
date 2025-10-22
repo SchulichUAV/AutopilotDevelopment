@@ -55,10 +55,8 @@ def mock_calculate_cost_with_turns(currentPoint, point, currentHeading):
 
 class TestWaypointSequence:
     
-    def test_single_waypoint_gps(self, monkeypatch):
+    def test_single_waypoint_gps(self):
         """Test with just one GPS waypoint"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         waypoints = [WAYPOINT_A]
         currentPos = [35.05980, -118.157, 30]  # Starting position near the waypoints
         currentHeading = np.array([1, 0, 0])  # Initial heading (will be normalized)
@@ -69,10 +67,8 @@ class TestWaypointSequence:
         assert result[0] == currentPos
         assert result[1] == WAYPOINT_A
     
-    def test_two_waypoints_gps(self, monkeypatch):
+    def test_two_waypoints_gps(self):
         """Test with two GPS waypoints"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         waypoints = [WAYPOINT_B, WAYPOINT_A]
         currentPos = [35.05980, -118.157, 30]
         currentHeading = np.array([1, 0, 0])
@@ -85,10 +81,8 @@ class TestWaypointSequence:
         assert WAYPOINT_A in result
         assert WAYPOINT_B in result
     
-    def test_three_waypoints_gps(self, monkeypatch):
+    def test_three_waypoints_gps(self):
         """Test with three GPS waypoints"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         waypoints = [WAYPOINT_A, WAYPOINT_B, WAYPOINT_C]
         currentPos = [35.05980, -118.157, 30]
         currentHeading = np.array([0, 1, 0])  # Heading north
@@ -101,27 +95,23 @@ class TestWaypointSequence:
         for wp in waypoints:
             assert wp in result
     
-    def test_all_seven_waypoints(self, monkeypatch):
+    def test_all_seven_waypoints(self):
         """Test with all seven competition waypoints"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         waypoints = [WAYPOINT_A, WAYPOINT_B, WAYPOINT_C, WAYPOINT_D, 
                      WAYPOINT_E, WAYPOINT_F, WAYPOINT_G]
         currentPos = [35.05980, -118.157, 30]  # Starting position
         currentHeading = np.array([0, 1, 0])  # Heading north
         
         result = find_best_waypoint_sequence(waypoints, currentPos, currentHeading)
-        
+
         assert len(result) == 8  # current pos + 7 waypoints
         assert result[0] == currentPos
         # All waypoints should be visited
         for wp in waypoints:
             assert wp in result
     
-    def test_empty_waypoints_gps(self, monkeypatch):
+    def test_empty_waypoints_gps(self):
         """Test with no waypoints"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         waypoints = []
         currentPos = [35.05980, -118.157, 30]
         currentHeading = np.array([1, 0, 0])
@@ -131,10 +121,8 @@ class TestWaypointSequence:
         assert len(result) == 1
         assert result[0] == currentPos
     
-    def test_turn_penalty_affects_path_gps(self, monkeypatch):
+    def test_turn_penalty_affects_path_gps(self):
         """Test that turn penalties favor straighter paths with GPS coords"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_with_turns)
-        
         # Waypoints that test turning behavior
         waypoints = [WAYPOINT_B, WAYPOINT_A, WAYPOINT_G]
         currentPos = [35.05980, -118.157, 30]
@@ -147,10 +135,9 @@ class TestWaypointSequence:
         for wp in waypoints:
             assert wp in result
     
-    def test_does_not_modify_input_gps(self, monkeypatch):
+    def test_does_not_modify_input_gps(self):
         """Ensure original waypoints list is not modified"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
+
         waypoints = [WAYPOINT_A, WAYPOINT_B, WAYPOINT_C]
         waypoints_copy = waypoints.copy()
         currentPos = [35.05980, -118.157, 30]
@@ -161,10 +148,8 @@ class TestWaypointSequence:
         # Original list should be unchanged
         assert waypoints == waypoints_copy
     
-    def test_altitude_variations(self, monkeypatch):
+    def test_altitude_variations(self):
         """Test waypoints with different altitudes"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         # Use waypoints with varying altitudes
         waypoints = [WAYPOINT_A, WAYPOINT_B, WAYPOINT_F]  # 50m, 100m, 75m
         currentPos = [35.05980, -118.157, 30]
@@ -239,10 +224,8 @@ class TestCalculateHeading:
 
 class TestIntegration:
     
-    def test_competition_scenario(self, monkeypatch):
+    def test_competition_scenario(self):
         """Test realistic competition scenario with all waypoints"""
-        monkeypatch.setattr('mission_pathfinding.calculate_cost', mock_calculate_cost_distance_only)
-        
         # All competition waypoints
         waypoints = [
             WAYPOINT_A, WAYPOINT_B, WAYPOINT_C, WAYPOINT_D,
