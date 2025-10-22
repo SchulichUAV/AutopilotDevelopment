@@ -3,7 +3,7 @@ import numpy as np
 
 ABORT_COST = 10000  
 
-def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list):
+def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list, geofence: list):
     """
     takes a list of waypoints as 3D vectors and the current position of the UAV and return the best sequence of waypoints for navigation
 
