@@ -4,7 +4,7 @@ import numpy as np
 ABORT_COST = 10000
 
 
-def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list):
+def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list, geofence: list):
     """
     takes a list of waypoints as 3D vectors and the current position of the UAV and return the best sequence of waypoints for navigation
 
@@ -18,12 +18,12 @@ def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeadin
         list: list of list in form [[a,b,c],[x,y,z]...]
     """
 
-    lowestCost, sequence = find_best_seq(currentPos, [currentPos], waypoints, 0, currentHeading)
+    lowestCost, sequence = find_best_seq(currentPos, [currentPos], waypoints, 0, currentHeading, geofence)
 
     return sequence
 
 
-def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading):
+def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading, geofence):
     # Base case: if there are no waypoints left, return the accumulated cost
     if len(waypointsLeft) == 0:
         return cost, currentSeq
@@ -37,10 +37,10 @@ def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading)
 
     # for every point from this one, calculate its cost and update the lowest cost and best sequence
     for i, point in enumerate(waypointsLeft):
-        stepCost = calculate_cost(currentPoint, point, currentHeading)
+        stepCost = calculate_cost(currentPoint, point, currentHeading, geofence)
 
         # calculate the heading
-        newHeading = calculate_heading(currentPoint, point)
+        newHeading = calculate_heading(currentPoint, point, geofence)
 
         # Create new sequence with this point added
         newSeq = currentSeq + [point]
@@ -54,7 +54,8 @@ def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading)
             newSeq,
             newWaypointsLeft,
             cost + stepCost,
-            newHeading
+            newHeading,
+            geofence
         )
 
         # Update best solution if this path is better
@@ -65,7 +66,7 @@ def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading)
     return lowestCost, bestSequence
 
 
-def relative_coordinates(coord):
+def relative_coordinates(coord, geofence):
     """
     This function converts latitude / longitude points in space into meters from the center of geofence;
     the goal is to improve precision and consistency since height is in meters and latitude measurements
@@ -75,7 +76,6 @@ def relative_coordinates(coord):
     latitude_to_meters = 111100
     longitude_to_meters = 92300
     # STEP 1) To make the conversions we need the center of the geofence; geofence will come as an arument in the future.
-    geofence = [(35.05932, -118.149), (35.06496, -118.156), (35.06062, -118.163), (35.05932, -118.163)]
     middle_lat = (geofence[0][0] + geofence[1][0] + geofence[2][0] + geofence[3][0]) / 4
     middle_long = (geofence[0][1] + geofence[1][1] + geofence[2][1] + geofence[3][1]) / 4
     #### Converting Coordinate to Meters From the Center of the Geofence: ####
@@ -86,7 +86,7 @@ def relative_coordinates(coord):
     return relative_coord
 
 
-def calculate_heading(currentPoint, point):
+def calculate_heading(currentPoint, point, geofence):
     """calculates the heading"""
     """
     Calculate the heading vector from one point to another.
@@ -98,8 +98,8 @@ def calculate_heading(currentPoint, point):
     Returns:
         heading: normalized direction vector
     """
-    relativeCurrentPoint = relative_coordinates(currentPoint)
-    relativePoint = relative_coordinates(point)
+    relativeCurrentPoint = relative_coordinates(currentPoint, geofence)
+    relativePoint = relative_coordinates(point, geofence)
     direction = np.array(relativePoint) - np.array(relativeCurrentPoint)
 
     norm = np.linalg.norm(direction)
@@ -111,7 +111,7 @@ def calculate_heading(currentPoint, point):
     return heading
 
 
-def calculate_cost(currentPoint, point, currentHeading):
+def calculate_cost(currentPoint, point, currentHeading, geofence):
     """
     Steps:
         1) convert all coordinates to meters from geofence center to make calculations simpler
@@ -124,8 +124,8 @@ def calculate_cost(currentPoint, point, currentHeading):
     prospectiveNode = point
 
     ################### Converting Coordinates to Meters Based on Their Distances from geofence center ##################
-    relativeCurrentNode = relative_coordinates(currentNode)  # currentNode -> Meters From Center of Geofence
-    relativeNxtNode = relative_coordinates(prospectiveNode)  # relativeNxtNode -> Meters From Center of Geofence
+    relativeCurrentNode = relative_coordinates(currentNode, geofence)  # currentNode -> Meters From Center of Geofence
+    relativeNxtNode = relative_coordinates(prospectiveNode, geofence)  # relativeNxtNode -> Meters From Center of Geofence
 
     ############################## Calculating weigths of proposed path ######################################
     """
