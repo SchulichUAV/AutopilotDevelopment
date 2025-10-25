@@ -1,6 +1,7 @@
 import pymavlink.dialects.v20.all as dialect
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
+import modules.AutopilotDevelopment.General.Operations.waypoint_uploader as waypoint_uploader
 import modules.AutopilotDevelopment.General.Operations.speed as speed
 import modules.payload as payload
 import time
@@ -9,7 +10,6 @@ import sys
 import os
 
 northing_offset = 1000
-waypoint_radius = 15
 drop_waypoint_radius = 1
 default_speed = 18
 loiter_radius = 40
@@ -57,121 +57,24 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         entry = waypoints.get("entry")
         exit = waypoints.get("exit")
 
-        if entry is None or exit is None:
-            print("Missing 'entry' or 'exit' waypoint in mission file.")
+        if entry is None:
+            print("Missing 'entry' waypoint in mission file.")
             return
+        if payload_object_coord is None:
+            print("Missing 'payload_object_coord' waypoint in mission file.")
+            return
+        if exit is None:
+            print("Missing 'exit' waypoint in mission file.")
+            return
+        
+        wpList = [entry, payload_object_coord, exit]
 
-        count = 4
-        # Begin mission upload
-        mission_count_msg = dialect.MAVLink_mission_count_message(
-            target_system=vehicle_connection.target_system,
-            target_component=vehicle_connection.target_component,
-            count=count,  # Number of waypoints, including waypoint 0
-            mission_type=0  # 0 = standard mission
-        )
-        vehicle_connection.mav.send(mission_count_msg)
-        print(f"Sent mission count: {count}")
-
-        # Loop through each waypoint request from the autopilot
-        for waypointId in range(count):
-            msg = vehicle_connection.recv_match(
-                type=['MISSION_REQUEST_INT', 'MISSION_REQUEST'], 
-                blocking=True, 
-                timeout=5
-            )
-
-            if msg is None and msg.seq == waypointId:
-                print("Mission upload failed: No valid request received from autopilot.")
-                return False
-
-            print(f"Sending waypoint {waypointId}")
-
-            # entry waypoint
-            if waypointId == 1:
-                waypoint.set_mission_waypoint(vehicle_connection, entry["lat"], entry["lon"], payload_object_coord[2], waypointId, waypoint_radius)
-            
-            # drop waypoint
-            elif waypointId == 2:
-                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, drop_waypoint_radius)
-            
-            # exit waypoint
-            elif waypointId == 3:
-                waypoint.set_mission_loiter_waypoint(vehicle_connection, exit["lat"], exit["lon"], payload_object_coord[2], loiter_radius, waypointId)
-            
-            # Payload waypoint and seq 0 waypoint, which is ignored by the autopilot
-            else:
-                waypoint.set_mission_waypoint(vehicle_connection, payload_object_coord[0], payload_object_coord[1], payload_object_coord[2], waypointId, waypoint_radius)
-
-        # Wait for final mission acknowledgment from autopilot
-        msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
-        if msg is None:
-            print("Mission upload failed: No MISSION_ACK received.")
-            return False
-
-        print("Mission upload completed successfully.")
-        return True
-
+        waypoint_uploader.upload_mission_waypoints(vehicle_connection, wpList)
+        
     except Exception as e:
-        print(f"Error in upload_mission_waypoints: {e}")
+        print(f"Error in upload_payload_mission_waypoints: {e}")
         return False
     
-def upload_mission_waypoints(vehicle_connection, waypoints):
-    # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
-    # REQUIRES: A vehicle connection and a list of waypoint in json format
-    # Note:
-    # - Waypoint 0 (Home position) is typically managed by the autopilot and will be ignored by the autopilot
-    # - The autopilot will still request waypoint 0, but this function will send the "first" waypoint regardless
-    # - The expected format for waypoint data is a list of {waypointId: {lat, lon, alt}}
-    # - The function will block until all waypoints are uploaded or a failure occurs.
-    # - This function is for general mission uploads.
-
-    try:
-        count = len(waypoints) + 1
-        # Begin mission upload
-        mission_count_msg = dialect.MAVLink_mission_count_message(
-            target_system=vehicle_connection.target_system,
-            target_component=vehicle_connection.target_component,
-            count=count,  # Number of waypoints, including waypoint 0
-            mission_type=0  # 0 = standard mission
-        )
-        vehicle_connection.mav.send(mission_count_msg)
-        print(f"Sent mission count: {count}")
-
-        # Loop through each waypoint request from the autopilot
-        for waypointId in range(count):
-            msg = vehicle_connection.recv_match(
-                type=['MISSION_REQUEST_INT', 'MISSION_REQUEST'], 
-                blocking=True, 
-                timeout=5
-            )
-
-            if msg is None and msg.seq == waypointId:
-                print("Mission upload failed: No valid request received from autopilot.")
-                return False
-
-            # assumes that waypoints are named with an id number, may be changed later
-            upload_wp = waypoints.get(str(waypointId))
-            print(f"Sending waypoint {waypointId}: {upload_wp}")
-
-            # waypoint 0 - ignored by autopilot
-            if waypointId == 0:
-                waypoint.set_mission_waypoint(vehicle_connection, 0, 0, 0, waypointId, waypoint_radius)
-            
-            else:
-                waypoint.set_mission_waypoint(vehicle_connection, upload_wp["lat"], upload_wp["lon"], upload_wp["alt"], waypointId, waypoint_radius)
-
-        # Wait for final mission acknowledgment from autopilot
-        msg = vehicle_connection.recv_match(type='MISSION_ACK', blocking=True, timeout=5)
-        if msg is None:
-            print("Mission upload failed: No MISSION_ACK received.")
-            return False
-
-        print("Mission upload completed successfully.")
-        return True
-
-    except Exception as e:
-        print(f"Error in upload_mission_waypoints: {e}")
-        return False
 
 def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data):
     try:
