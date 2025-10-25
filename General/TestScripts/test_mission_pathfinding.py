@@ -52,6 +52,15 @@ def mock_calculate_cost_with_turns(currentPoint, point, currentHeading):
     turn_penalty = 100.0 * angle**2  # Higher penalty for GPS coordinates
     return distance + turn_penalty
 
+'''
+TESTING MOVING FORWARD
+    - write out some example paths
+    - have an ideal path in mind
+    - see if pure function output generates that ideal path
+    - take height into account here
+    - see the output: which should be the list of waypoints in correct order
+
+'''
 
 class TestWaypointSequence:
     
