@@ -73,18 +73,38 @@ def relative_coordinates(coord, geofence):
     are different from longitude measurements.
     """
     #### Conversion Factors: ###
-    latitude_to_meters = 111100
-    longitude_to_meters = 92300
+    latitudeToMeters = 111100
+    longitudeToMeters = 92300
     # STEP 1) To make the conversions we need the center of the geofence; geofence will come as an arument in the future.
-    middle_lat = (geofence[0][0] + geofence[1][0] + geofence[2][0] + geofence[3][0]) / 4
-    middle_long = (geofence[0][1] + geofence[1][1] + geofence[2][1] + geofence[3][1]) / 4
+    middleLat = (geofence[0][0] + geofence[1][0] + geofence[2][0] + geofence[3][0]) / 4
+    middleLong = (geofence[0][1] + geofence[1][1] + geofence[2][1] + geofence[3][1]) / 4
     #### Converting Coordinate to Meters From the Center of the Geofence: ####
-    x_coord = (coord[0] - middle_lat) * latitude_to_meters
-    y_coord = (coord[1] - middle_long) * longitude_to_meters
-    z_coord = coord[2]
-    relative_coord = (x_coord, y_coord, z_coord)
+    if len(coord) > 2:
+        xCoord = (coord[0] - middleLat) * latitudeToMeters
+        yCoord = (coord[1] - middleLong) * longitudeToMeters
+        zCoord = coord[2]
+        relative_coord = (xCoord, yCoord, zCoord)
+    else:
+        xCoord = (coord[0] - middleLat) * latitudeToMeters
+        yCoord = (coord[1] - middleLong) * longitudeToMeters
+        relative_coord = (xCoord, yCoord,0)
     return relative_coord
 
+def geofence_vectors(geofence):
+    """
+    This function connects each pair of consecutive geofence points with direction vectors and stores them at a list called geofenceV.
+    The lists geofence and geofenceV will share the same indexing:
+        - geofence[i] represents the position of the tail of geofenceV[i] direction vector.
+    """
+    geofenceV = []
+    for i in range(len(geofence)): # loop through geofence points
+        preVectorTail = relative_coordinates(geofence[i], geofence)
+        preVectorHead = relative_coordinates(geofence[(i + 1) % len(geofence)], geofence) # "%len(geofence)" ensures we loop back to the first point after the last
+        vectorTail = np.array(preVectorTail)
+        vectorHead = np.array(preVectorHead) 
+        vector = vectorHead - vectorTail
+        geofenceV.append(vector)
+    return geofenceV
 
 def calculate_heading(currentPoint, point, geofence):
     """calculates the heading"""
@@ -118,7 +138,7 @@ def calculate_cost(currentPoint, point, currentHeading, geofence):
         2) determine parameters to adjust weights and decide which path to go
         3) convert back to latitude and longitude and return results
     """
-    ### Data Recieved and Transformed: ###
+    ### Data Recieved: ###
     previousVector = currentHeading
     currentNode = currentPoint
     prospectiveNode = point
@@ -130,33 +150,71 @@ def calculate_cost(currentPoint, point, currentHeading, geofence):
     ############################## Calculating weigths of proposed path ######################################
     """
     Evaluating weights:
-    Distances: visualizing distances as vectors, the bigger the distance from head to tail the higher the weight
-    Angle: we can't turn more than 1.5 degrees per meter, sharp turns will lead to big weights
+    Weight 1 - Distance: visualizing distances as vectors, the bigger the distance from head to tail the higher the weight
+    Weight 2 - Angle: we can't turn more than 1.5 degrees per meter, sharp turns will lead to big weights
+    Weight 3 - Risk: paths that approach the geofence borders at dangerous angles (close to perpendicular) will have big weights
     """
-    # Nearest Neighbour weight calculation:
-    # angle weight factors:
+    currentWeight = 0
+    ### Parameters for Weights Calculation: ###
+    # Angle Weight Factors: -- parameters associated with Weight 2
     angleWeightFactor = 100  # greater values makes angle more impactful
     angleSteepnessFactor = 4  # this number defines how impactful it is to increase the angle
+    # Risk Weight Factors: -- parameters associated with Weight 3
+    safetyDistance = 80  # distance from geofence border to start considering risk
+    perpendicularAngleLow = 70  # lower bound of angle to consider it perperdicular-ish
+    perpendicularAngleHigh = 110  # upper bound of angle to consider it perperdicular-ish
+    riskWeightPenalty = 5000  # greater values makes riskier paths more impactful
 
-    current_weight = 0
     # Vector from current position to prospective waypoint
     vectorTail = np.array(relativeCurrentNode)
     vectorHead = np.array(relativeNxtNode)
-    prospectiveVector = vectorHead - vectorTail  # vector from current node to endpoint
-    # Weight 1: Distance from tail to head
+    prospectiveVector = vectorHead - vectorTail  # vector from current node to next node
+
+    ### Weight 1: Distance from current position to prospective waypoint ###
     distance = np.linalg.norm(prospectiveVector)
-    current_weight += distance
-    # Weight 2: Angle per meter (skip on first iteration)
-    dotProduct = np.dot(prospectiveVector, previousVector)
+    currentWeight += distance
+
+    ### Weight 2: Angle per meter between previous vector and prospective vector ###
+    dotProductTurn = prospectiveVector @ previousVector
     normPrevious = np.linalg.norm(previousVector)
     normProspective = np.linalg.norm(prospectiveVector)
     # Included angle formula from linear algebra, clip to avoid errors, then convert to degrees
-    cosAngle = dotProduct / (normProspective * normPrevious)
-    # Clip to handle floating-point precision errors
-    cosAngle = np.clip(cosAngle, -1.0, 1.0)
+    cosAngleTurn = dotProductTurn / (normProspective * normPrevious)
+    cosAngleTurn = np.clip(cosAngleTurn, -1.0, 1.0) # Clip to handle floating-point precision errors
     # Calculate the included angle in degrees
-    includedAngle = np.degrees(np.arccos(cosAngle))
-    anglePerMeter = includedAngle / distance
+    includedAngleTurn = np.degrees(np.arccos(cosAngleTurn))
+    anglePerMeter = includedAngleTurn / distance
     # exponential function since path gets exponentially worse when angle/meter increases
-    current_weight += angleWeightFactor ** (anglePerMeter * angleSteepnessFactor)
-    return current_weight
+    currentWeight += angleWeightFactor ** (anglePerMeter * angleSteepnessFactor)
+
+    ### Weight 3: Distance from geofence borders, this weight will "prohibit" dangerous paths while ignoring safe ones ###
+    """ 
+    Explanation on Weight 3:
+    Goal: prevent the UAV from approaching the geofence border at a dangerous angles (close to perperdicular).
+    Steps:
+        1) Call the function "geofence_vectors" to get the vectors connecting each geofence point.
+        2) Loop through each geofence border and calculate the distance from the prospective path to each border using the point-to-vector distance formula.
+        3) Loop through close borders and calculate the included angle between them and our prospective path using the included angle formula.
+        4) If the included angle is close to perpendicular (between 70 and 110 degrees) it means the path is dangerous, so we add a huge weight to it. 
+    """
+    closeBorders = []  # list of geofence borders that are close to the prospective path
+    borders = geofence_vectors(geofence) # vectors connecting the geofence borders
+    pointToCheck = np.array(relativeNxtNode) # The endpoint of the prospective path
+    # Loop through geofence borders and store close vectors
+    for i, borderVector in enumerate(borders): 
+        borderStart = np.array(relative_coordinates(geofence[i], geofence)) # "geofence" and "borders" lists share the same indexing, so geofence[i] is the start point of borders[i]
+        projectionFactor = ((pointToCheck - borderStart) @ borderVector) / (borderVector @ borderVector) # Compute the scalar projection of the point onto the border vector    
+        closestPointOnBorder = borderStart + projectionFactor * borderVector # Compute the closest point on the border segment to our point
+        distanceToBorder = np.linalg.norm(pointToCheck - closestPointOnBorder) # Calculate the distance from our point to this closest point on the border
+        if distanceToBorder < safetyDistance: # If the path endpoint is too close to this border, we must store it for angle evaluation
+            closeBorders.append(borderVector)
+    # Evaluate angles between prospective path and close borders to avoid leaving the geofence boundaries
+    for closeBorderVector in closeBorders:
+        dotProductBorder = prospectiveVector @ closeBorderVector
+        normBorder = np.linalg.norm(closeBorderVector)
+        cosAngleBorder = dotProductBorder / (normProspective * normBorder)
+        cosAngleBorder = np.clip(cosAngleBorder, -1.0, 1.0) # Clip to avoid floating-point precision errors
+        includedAngleBorder = np.degrees(np.arccos(cosAngleBorder)) # Calculate the included angle in degrees
+        if includedAngleBorder > perpendicularAngleLow and includedAngleBorder < perpendicularAngleHigh: # if angle is perpendicular-ish
+            currentWeight += riskWeightPenalty # big penalty for dangerous path, not worth it
+    return currentWeight
