@@ -21,15 +21,13 @@ import modules.AutopilotDevelopment.General.Operations.arm as arm
 sys.path.append(os.path.abspath('./../'))
 from plane import Plane
 
-CONFIG_FILE = "./GlobalConfig.json"
 
 
 class TestSITL:
     @pytest.fixture(scope="class", autouse=True)
     def setup_class(cls):
-        with open(CONFIG_FILE, 'r') as f:
-            config = json.load(f)
-        plane = Plane(vehicle_connection=config["vehicle_connection"])
+       
+        plane = Plane()
 
         cls.vehicle_connection = plane.vehicle_connection
         

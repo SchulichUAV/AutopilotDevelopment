@@ -1,6 +1,7 @@
 from pymavlink import mavutil
 import sys
 import os
+import json
 
 script_dir = os.path.abspath('./..')
 sys.path.append(script_dir)
@@ -17,13 +18,23 @@ import modules.AutopilotDevelopment.Plane.Operations.system_state as plane_syste
 import modules.AutopilotDevelopment.Plane.Operations.takeoff as plane_takeoff_config
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as plane_waypoint
 
+CONFIG_FILE = "./GlobalConfig.json"
+
 class Plane:
-    def __init__(self, vehicle_connection='udpin:127.0.0.1:14550'):
-        self.vehicle_connection, self.valid_connection = plane_initialize.connect_to_vehicle(vehicle_connection)
+    def __init__(self):
+        
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+
+        self.vehicle_connection, self.valid_connection = plane_initialize.connect_to_vehicle(config["vehicle_connection"])
         self.current_payload_servo = 1
         self.set_min_speed_param()
         self.set_max_speed_param()
-        print(f"Connected to vehicle at {vehicle_connection}")
+        print(f"Connected to vehicle at {config["vehicle_connection"]}")
+
+        
+
+        
 
     def arm_vehicle(self):
         plane_arm.arm(self.vehicle_connection)
