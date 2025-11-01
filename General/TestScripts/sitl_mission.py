@@ -9,11 +9,8 @@ import modules.AutopilotDevelopment.General.Operations.mode as mode
 import modules.AutopilotDevelopment.General.Operations.mission as mission
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 
-vehicle_connection = initialize.connect_to_vehicle('udpin:172.25.176.1:14550')
+vehicle_connection = initialize.connect_to_vehicle('udpin:172.18.192.1:14550')
 
-object_location = [51.25996053, -113.9266562, 20]
+object_location = {"lat":-35.36500000, "lon": 149.16700000, "alt": 60.0}
 
 mission.upload_payload_drop_mission(vehicle_connection, object_location)
-print("Will need to manually put into AUTO mode...")
-input("Press Enter to begin distance check and payload drop...")
-mission.check_distance_and_drop(vehicle_connection, 1)
