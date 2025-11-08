@@ -157,8 +157,8 @@ def calculate_cost(currentPoint, point, currentHeading, geofence):
     currentWeight = 0
     ### Parameters for Weights Calculation: ###
     # Angle Weight Factors: -- parameters associated with Weight 2
-    angleWeightFactor = 100  # greater values makes angle more impactful
-    angleSteepnessFactor = 4  # this number defines how impactful it is to increase the angle
+    angleWeightFactor = 6  # greater values makes angle more impactful
+    angleSteepnessFactor = 5.5  # this number defines how impactful it is to increase the angle
     # Risk Weight Factors: -- parameters associated with Weight 3
     safetyDistance = 80  # distance from geofence border to start considering risk
     perpendicularAngleLow = 70  # lower bound of angle to consider it perperdicular-ish
@@ -185,7 +185,7 @@ def calculate_cost(currentPoint, point, currentHeading, geofence):
     includedAngleTurn = np.degrees(np.arccos(cosAngleTurn))
     anglePerMeter = includedAngleTurn / distance
     # exponential function since path gets exponentially worse when angle/meter increases
-    currentWeight += angleWeightFactor ** (anglePerMeter * angleSteepnessFactor)
+    currentWeight += (cosAngleTurn + (angleWeightFactor ** (anglePerMeter * angleSteepnessFactor)))//2
 
     ### Weight 3: Distance from geofence borders, this weight will "prohibit" dangerous paths while ignoring safe ones ###
     """ 

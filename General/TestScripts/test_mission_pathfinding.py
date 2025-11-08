@@ -17,7 +17,13 @@ WAYPOINT_E = [35.06127, -118.157, 50]
 WAYPOINT_F = [35.06206, -118.159, 75]
 WAYPOINT_G = [35.05989, -118.16, 100]
 all_waypoints = [WAYPOINT_A, WAYPOINT_B, WAYPOINT_C, WAYPOINT_D, WAYPOINT_E, WAYPOINT_F, WAYPOINT_G]
-
+readDict = {"waypoint_A": WAYPOINT_A,
+            "waypoint_B": WAYPOINT_B,
+            "waypoint_C": WAYPOINT_C,
+            "waypoint_D": WAYPOINT_D,
+            "waypoint_E": WAYPOINT_E,
+            "waypoint_F": WAYPOINT_F,
+            "waypoint_G": WAYPOINT_G}
 
 # Geofence boundaries
 GF_POINT_A = [35.05932, -118.149, 0]
@@ -40,6 +46,11 @@ TESTING MOVING FORWARD
 def testFunction():
     current_heading = calculate_heading(CURRENT_POS, WAYPOINT_A, GEOFENCE)
     directions_to_mcdonalds = find_best_waypoint_sequence(all_waypoints, CURRENT_POS, current_heading, GEOFENCE)
-    print(directions_to_mcdonalds)
+
+    for waypoint in directions_to_mcdonalds:
+        for key, value in readDict.items():
+            if value == waypoint:
+                print(f"{key} - {value}")
+                break
 
 testFunction()
