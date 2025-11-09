@@ -1,12 +1,11 @@
 import pytest
 import numpy as np
 import sys
-import os 
+import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Operations')))
 
-from mission_pathfinding import find_best_waypoint_sequence, calculate_heading, calculate_cost
-
+from mission_pathfinding import find_best_waypoint_sequence, calculate_heading, calculate_cost, geofence_vectors, generate_random_waypoints
 # 2025 Reference waypoints (lat, lon, alt in meters)
 CURRENT_POS = [35.05932, -118.149, 25]
 WAYPOINT_A = [35.05987, -118.156, 50]
@@ -16,7 +15,10 @@ WAYPOINT_D = [35.06312, -118.155, 50]
 WAYPOINT_E = [35.06127, -118.157, 50]
 WAYPOINT_F = [35.06206, -118.159, 75]
 WAYPOINT_G = [35.05989, -118.16, 100]
+"""
+############ Uncoment this section and comment out lines 37 & 38 to use data from the 2025 competition ############
 all_waypoints = [WAYPOINT_A, WAYPOINT_B, WAYPOINT_C, WAYPOINT_D, WAYPOINT_E, WAYPOINT_F, WAYPOINT_G]
+"""
 readDict = {"waypoint_A": WAYPOINT_A,
             "waypoint_B": WAYPOINT_B,
             "waypoint_C": WAYPOINT_C,
@@ -32,6 +34,9 @@ GF_POINT_C = [35.06062, -118.163, 0]
 GF_POINT_D = [35.05932, -118.163, 0]
 
 GEOFENCE = [(35.05932, -118.149), (35.06496, -118.156), (35.06062, -118.163), (35.05932, -118.163)]
+borders = geofence_vectors(GEOFENCE)
+all_waypoints = generate_random_waypoints(borders, GEOFENCE)
+
 
 '''
 TESTING MOVING FORWARD
@@ -40,8 +45,11 @@ TESTING MOVING FORWARD
     - see if pure function output generates that ideal path
     - take height into account here
     - see the output: which should be the list of waypoints in correct order
+'''
 
 '''
+#########   Uncomment this function to run the test with the 2025 competition data    #########
+                        # to do so must comment out the function below it #
 
 def testFunction():
     current_heading = calculate_heading(CURRENT_POS, WAYPOINT_A, GEOFENCE)
@@ -52,5 +60,15 @@ def testFunction():
             if value == waypoint:
                 print(f"{key} - {value}")
                 break
+'''
+
+def testFunction():
+    current_heading = calculate_heading(CURRENT_POS, all_waypoints[0], GEOFENCE)
+    directions_to_mcdonalds = find_best_waypoint_sequence(all_waypoints, CURRENT_POS, current_heading, GEOFENCE)
+
+    print("Generated Waypoint Sequence:")
+    for idx, waypoint in enumerate(directions_to_mcdonalds[1:],1):
+        print(f"Waypoint {idx}: {waypoint[0]:.5f}, {waypoint[1]:.5f}, {waypoint[2]}")
+
 
 testFunction()

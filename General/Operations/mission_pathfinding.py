@@ -1,7 +1,12 @@
 from typing import Optional
 import numpy as np
+import random
 
+##### Constants: ####
 ABORT_COST = 10000
+# Conversion Factors: 
+LATITUDE_TO_METERS = 111100
+LONGITUDE_TO_METERS = 92300
 
 
 def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list, geofence: list):
@@ -72,21 +77,18 @@ def relative_coordinates(coord, geofence):
     the goal is to improve precision and consistency since height is in meters and latitude measurements
     are different from longitude measurements.
     """
-    #### Conversion Factors: ###
-    latitudeToMeters = 111100
-    longitudeToMeters = 92300
     # STEP 1) To make the conversions we need the center of the geofence; geofence will come as an arument in the future.
-    middleLat = (geofence[0][0] + geofence[1][0] + geofence[2][0] + geofence[3][0]) / 4
-    middleLong = (geofence[0][1] + geofence[1][1] + geofence[2][1] + geofence[3][1]) / 4
+    middleLat, middleLong = geofence_center(geofence)
+
     #### Converting Coordinate to Meters From the Center of the Geofence: ####
     if len(coord) > 2:
-        xCoord = (coord[0] - middleLat) * latitudeToMeters
-        yCoord = (coord[1] - middleLong) * longitudeToMeters
+        xCoord = (coord[0] - middleLat) * LATITUDE_TO_METERS
+        yCoord = (coord[1] - middleLong) * LONGITUDE_TO_METERS
         zCoord = coord[2]
         relative_coord = (xCoord, yCoord, zCoord)
     else:
-        xCoord = (coord[0] - middleLat) * latitudeToMeters
-        yCoord = (coord[1] - middleLong) * longitudeToMeters
+        xCoord = (coord[0] - middleLat) * LATITUDE_TO_METERS
+        yCoord = (coord[1] - middleLong) * LONGITUDE_TO_METERS
         relative_coord = (xCoord, yCoord,0)
     return relative_coord
 
@@ -218,3 +220,74 @@ def calculate_cost(currentPoint, point, currentHeading, geofence):
         if includedAngleBorder > perpendicularAngleLow and includedAngleBorder < perpendicularAngleHigh: # if angle is perpendicular-ish
             currentWeight += riskWeightPenalty # big penalty for dangerous path, not worth it
     return currentWeight
+
+
+def geofence_center(geofence):
+    # Calculate the center of the geofence
+    middleLat = (geofence[0][0] + geofence[1][0] + geofence[2][0] + geofence[3][0]) / 4
+    middleLong = (geofence[0][1] + geofence[1][1] + geofence[2][1] + geofence[3][1]) / 4
+    return middleLat, middleLong
+
+
+def generate_random_waypoints(borders, geofence):
+    """
+    Generate random waypoints within geofence boundaries.
+    Waypoints must be at least 60 meters apart from geofence border.
+    Waypoints must be at least 250 meters apart from each other.
+    """
+    
+    # Get geofence center in lat/long:
+    middleLat, middleLong = geofence_center(geofence)
+    newWaypoints = []
+    possibleAltitudes = [50, 75, 100]
+
+    # count attempts to avoid infinite loops:
+    maxAttempts = 2000 
+    attempts = 0
+
+    # Generate 7 random waypoints:
+    while len(newWaypoints) < 7:
+        attempts += 1
+        if attempts > maxAttempts:
+            newWaypoints.clear() # reset list
+            attempts = 0 # reset counter
+            continue # restart waypoint generation from scratch
+
+        # Generate random offset in meters:
+        randomCoordX = random.randint(-200, 200)
+        randomCoordY = random.randint(-330, 330)
+        wayAltitude = random.choice(possibleAltitudes)
+        
+        # Create point in relative coordinates (meters from center of geofence)
+        pointToCheck = np.array([randomCoordX, randomCoordY, wayAltitude])
+        
+        # Check distance from all borders
+        validDistance = True
+        for i, borderVector in enumerate(borders):
+            borderStart = np.array(relative_coordinates(geofence[i], geofence))
+            projectionFactor = ((pointToCheck - borderStart) @ borderVector) / (borderVector @ borderVector)
+            closestPointOnBorder = borderStart + projectionFactor * borderVector
+            distanceToBorder = np.linalg.norm(pointToCheck - closestPointOnBorder)
+            if distanceToBorder <= 60:
+                validDistance = False
+                break
+        
+        # Check distance from all existing waypoints (must be at least 300m apart)
+        if validDistance:
+            for createdWaypoint in newWaypoints:
+                normalizedCreatedWaypoint = np.array(relative_coordinates(createdWaypoint, geofence))
+                vectorTail = normalizedCreatedWaypoint
+                vectorHead = pointToCheck
+                prospectiveVector = vectorHead - vectorTail
+                distance = np.linalg.norm(prospectiveVector)
+                if distance < 250:
+                    validDistance = False
+                    break
+    
+        # If point is valid, convert back to lat/long and add to waypoints
+        if validDistance:
+            wayLat = middleLat + (randomCoordX / LATITUDE_TO_METERS)
+            wayLong = middleLong + (randomCoordY / LONGITUDE_TO_METERS)
+            newWaypoints.append([wayLat, wayLong, wayAltitude])
+            
+    return newWaypoints
