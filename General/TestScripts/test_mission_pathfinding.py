@@ -66,9 +66,10 @@ def testFunction():
     current_heading = calculate_heading(CURRENT_POS, all_waypoints[0], GEOFENCE)
     directions_to_mcdonalds = find_best_waypoint_sequence(all_waypoints, CURRENT_POS, current_heading, GEOFENCE)
 
-    print("Generated Waypoint Sequence:")
-    for idx, waypoint in enumerate(directions_to_mcdonalds[1:],1):
-        print(f"Waypoint {idx}: {waypoint[0]:.5f}, {waypoint[1]:.5f}, {waypoint[2]}")
+    #print("Generated Waypoint Sequence:")
+    #for waypoint in directions_to_mcdonalds:
+        #print(waypoint)
+    return directions_to_mcdonalds
 
-
-testFunction()
+if __name__ == "__main__":
+    testFunction()

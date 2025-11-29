@@ -21,11 +21,18 @@ def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeadin
 
     Returns:
         list: list of list in form [[a,b,c],[x,y,z]...]
+
+    Post processing: 
+        Format must be compatible with waypoint_uploader
+        Convert the list of waypoints into a list of dict, waypoint_list = [{'lat': , 'lon': ,'alt': }, ...].
     """
-
     lowestCost, sequence = find_best_seq(currentPos, [currentPos], waypoints, 0, currentHeading, geofence)
+    waypoint_list = []
+    for waypoint in sequence:
+        waypoint_dict = {'lat': waypoint[0], 'lon': waypoint[1], 'alt': waypoint[2]}
+        waypoint_list.append(waypoint_dict)
 
-    return sequence
+    return waypoint_list
 
 
 def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading, geofence):

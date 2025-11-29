@@ -1,7 +1,11 @@
 import pymavlink.dialects.v20.all as dialect
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
+from modules.AutopilotDevelopment.General.Operations.mission_pathfinding import find_best_waypoint_sequence, calculate_heading, calculate_cost, geofence_vectors, generate_random_waypoints
+from modules.AutopilotDevelopment.General.TestScripts.test_mission_pathfinding import testFunction
 
 waypoint_radius = 15
+
+waypoints = testFunction()
 
 def upload_mission_waypoints(vehicle_connection, waypoints):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
