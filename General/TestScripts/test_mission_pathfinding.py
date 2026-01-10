@@ -1,4 +1,6 @@
 import pytest
+import modules.AutopilotDevelopment.General.Operations.waypoint_uploader as wu
+import modules.AutopilotDevelopment.General.Operations.initialize as init
 import numpy as np
 import sys
 import os
@@ -72,4 +74,6 @@ def testFunction():
     return directions_to_mcdonalds
 
 if __name__ == "__main__":
-    testFunction()
+    vehicle_connection = init.connect_to_vehicle(r"172.21.128.1:14550")
+    wp = testFunction()
+    wu.upload_mission_waypoints(vehicle_connection, wp)
