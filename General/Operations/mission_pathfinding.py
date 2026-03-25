@@ -1,4 +1,6 @@
 from typing import Optional
+import modules.AutopilotDevelopment.General.Operations.waypoint_uploader as wu
+import modules.AutopilotDevelopment.General.Operations.initialize as init
 import numpy as np
 import random
 
@@ -7,6 +9,25 @@ ABORT_COST = 10000
 # Conversion Factors: 
 LATITUDE_TO_METERS = 111100
 LONGITUDE_TO_METERS = 92300
+# Temporary constants, replace with live data from GCS when integrating with server.py
+CURRENT_POS = [35.05932, -118.149, 25]
+GEOFENCE = [(35.05932, -118.149), (35.06496, -118.156), (35.06062, -118.163), (35.05932, -118.163)]
+
+
+
+###################### <DELETE THIS SECTION, IMMEDIATE DELETION> ##################
+# Temporary test data - replace with live waypoints from GCS when integrating with server.py
+test_waypoint_list_of_dicts = [
+    {"waypointID": 1, "alt": 50, "lat": 35.05987, "lon": -118.156},
+    {"waypointID": 2, "alt": 100, "lat": 35.05991, "lon": -118.152},
+    {"waypointID": 3, "alt": 75, "lat": 35.06121, "lon": -118.153},
+    {"waypointID": 4, "alt": 50, "lat": 35.06312, "lon": -118.155},
+    {"waypointID": 5, "alt": 50, "lat": 35.06127, "lon": -118.157},
+    {"waypointID": 6, "alt": 75, "lat": 35.06206, "lon": -118.159},
+    {"waypointID": 7, "alt": 100, "lat": 35.05989, "lon": -118.16},
+]
+###################### </DELETE THIS SECTION, IMMEDIATE DELETION> #################
+
 
 
 def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list, geofence: list):
@@ -298,3 +319,28 @@ def generate_random_waypoints(borders, geofence):
             newWaypoints.append([wayLat, wayLong, wayAltitude])
             
     return newWaypoints
+
+
+################################## Run Pathfinding algorithm #####################################
+def run_mission_pathfinding(waypoint_list_of_dicts):
+    """ 
+    - Receives Json format [{"lat": ..., "lon": ..., "alt": ...}], and computes the optimal sequence using the pathfinding algorithm, and returns the result ready for upload. 
+    - Remember to set the vehicle connection to the actual connection string, so you can successfully connect to ArduPilot and upload the mission.
+    """
+    all_waypoints = []
+    for waypoint in waypoint_list_of_dicts: 
+        waypoint_coords = [waypoint["lat"], waypoint["lon"], waypoint["alt"]]
+        all_waypoints.append(waypoint_coords)
+    current_heading = calculate_heading(CURRENT_POS, all_waypoints[0], GEOFENCE)
+    return find_best_waypoint_sequence(all_waypoints, CURRENT_POS, current_heading, GEOFENCE)
+
+
+if __name__ == "__main__":
+    print("Connecting to vehicle...")
+    vehicle_connection = init.connect_to_vehicle(r"127.0.0.1:5760")
+    print("Connected!")
+    result = run_mission_pathfinding(test_waypoint_list_of_dicts)
+    print(result)
+    wu.upload_mission_waypoints(vehicle_connection, result)
+
+    print("Mission uploaded successfully!")
