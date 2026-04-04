@@ -15,20 +15,6 @@ GEOFENCE = [(35.05932, -118.149), (35.06496, -118.156), (35.06062, -118.163), (3
 
 
 
-###################### <DELETE THIS SECTION, IMMEDIATE DELETION> ##################
-# Temporary test data - replace with live waypoints from GCS when integrating with server.py
-test_waypoint_list_of_dicts = [
-    {"waypointID": 1, "alt": 50, "lat": 35.05987, "lon": -118.156},
-    {"waypointID": 2, "alt": 100, "lat": 35.05991, "lon": -118.152},
-    {"waypointID": 3, "alt": 75, "lat": 35.06121, "lon": -118.153},
-    {"waypointID": 4, "alt": 50, "lat": 35.06312, "lon": -118.155},
-    {"waypointID": 5, "alt": 50, "lat": 35.06127, "lon": -118.157},
-    {"waypointID": 6, "alt": 75, "lat": 35.06206, "lon": -118.159},
-    {"waypointID": 7, "alt": 100, "lat": 35.05989, "lon": -118.16},
-]
-###################### </DELETE THIS SECTION, IMMEDIATE DELETION> #################
-
-
 
 def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list, geofence: list):
     """
