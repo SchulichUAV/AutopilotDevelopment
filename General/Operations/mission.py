@@ -1,9 +1,11 @@
+from sympy import false, true
+
 import pymavlink.dialects.v20.all as dialect
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
 import modules.AutopilotDevelopment.General.Operations.waypoint_uploader as waypoint_uploader
 import modules.AutopilotDevelopment.General.Operations.speed as speed
-# import modules.payload as payload
+import modules.payload as payload
 import time
 import json
 import sys
@@ -130,7 +132,7 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
 
             if (msg is not None and msg.seq == 2) or distance < drop_distance:
                 try:
-                    # payload.payload_release(kit, current_servo, vehicle_data)
+                    payload.set_servo_state(current_servo, True)
                     print(f"Dropping payload for servo #{current_servo}")
                 except Exception as e:
                     print(f"[Error] Failed to release payload: {e}")
@@ -142,8 +144,12 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
         return
 
     try:
+
         print(f"Setting cruise speed back to {default_speed} m/s")
         speed.set_cruise_speed(vehicle_connection, default_speed)
+
+        print(f"Closing servo")
+        payload.set_servo_state(current_servo, False)
     except Exception as e:
         print(f"[Error] Failed to reset cruise speed: {e}")
     finally:
