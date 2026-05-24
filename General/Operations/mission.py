@@ -132,7 +132,7 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
 
             if (msg is not None and msg.seq == 2) or distance < drop_distance:
                 try:
-                    payload.set_servo_state(current_servo, True)
+                    payload.open_servo(kit, current_servo)
                     print(f"Dropping payload for servo #{current_servo}")
                 except Exception as e:
                     print(f"[Error] Failed to release payload: {e}")
