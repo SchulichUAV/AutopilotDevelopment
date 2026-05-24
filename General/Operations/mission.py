@@ -3,7 +3,7 @@ import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
 import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as monitor_waypoint
 import modules.AutopilotDevelopment.General.Operations.waypoint_uploader as waypoint_uploader
 import modules.AutopilotDevelopment.General.Operations.speed as speed
-import modules.payload as payload
+# import modules.payload as payload
 import time
 import json
 import sys
@@ -11,16 +11,16 @@ import os
 
 northing_offset = 1000
 drop_waypoint_radius = 1
-default_speed = 18
+default_speed = 23
 loiter_radius = 40
 
 def read_mission_json():
     try:
         base_dir = os.path.dirname(__file__)
-        # file_path = os.path.join(base_dir, "airdrie.json") # Airdrie Flying Club
+        file_path = os.path.join(base_dir, "airdrie.json") # Airdrie Flying Club
         # file_path = os.path.join(base_dir, "zone1.json") # Competition - zone 1 (left side, west end of runway)
         # file_path = os.path.join(base_dir, "zone2.json") # Competition - zone 2 (right side, east end of runway)
-        file_path = os.path.join(base_dir, "test.json")
+        # file_path = os.path.join(base_dir, "test.json")
         
 
         if not os.path.exists(file_path):
@@ -41,7 +41,21 @@ def drop_distance_json():
     except Exception as e:
         raise ValueError("Failed to read drop distance")
 
-def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
+def drop_height_json():
+    try:
+        data = read_mission_json()
+        return data["drop_height"]
+    except Exception as e:
+        raise ValueError("Failed to read drop height")
+    
+def drop_speed_json():
+    try:
+        data = read_mission_json()
+        return data["drop_speed"]
+    except Exception as e:
+        raise ValueError("Failed to read drop speed")
+
+def upload_payload_drop_mission(vehicle_connection):
     # PROMISES: Will upload a collection of waypoints to a ArduPilot vehicle
     # REQUIRES: A vehicle connection and a payload object location
     # Note:
@@ -55,21 +69,22 @@ def upload_payload_drop_mission(vehicle_connection, payload_object_coord):
         data = read_mission_json()
         waypoints = data.get("waypoints", {})
         entry = waypoints.get("entry")
+        midpoint = waypoints.get("midpoint")
         exit = waypoints.get("exit")
 
         if entry is None:
             print("Missing 'entry' waypoint in mission file.")
             return
-        if payload_object_coord is None:
-            print("Missing 'payload_object_coord' waypoint in mission file.")
+        if midpoint is None:
+            print("Missing 'midpoint' waypoint in mission file.")
             return
         if exit is None:
             print("Missing 'exit' waypoint in mission file.")
             return
         
-        wpList = [entry, payload_object_coord, exit]
+        wpList = [entry, midpoint, exit]
 
-        waypoint_uploader.upload_mission_waypoints(vehicle_connection, wpList)
+        waypoint_uploader.upload_mission_waypoints(vehicle_connection, wpList, drop_height_json())
         
     except Exception as e:
         print(f"Error in upload_payload_mission_waypoints: {e}")
@@ -89,7 +104,7 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
             if msg is not None and msg.seq == 2:
                 try:
                     print(f"Setting cruise speed to minimum for drop.")
-                    # speed.set_min_cruise_speed(vehicle_connection)
+                    speed.set_cruise_speed(vehicle_connection, drop_speed_json())
                 except Exception as e:
                     print(f"[Error] Failed to set min cruise speed: {e}")
                 break
@@ -115,7 +130,7 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
 
             if (msg is not None and msg.seq == 2) or distance < drop_distance:
                 try:
-                    payload.payload_release(kit, current_servo, vehicle_data)
+                    # payload.payload_release(kit, current_servo, vehicle_data)
                     print(f"Dropping payload for servo #{current_servo}")
                 except Exception as e:
                     print(f"[Error] Failed to release payload: {e}")
@@ -128,7 +143,7 @@ def check_distance_and_drop(vehicle_connection, current_servo, kit, vehicle_data
 
     try:
         print(f"Setting cruise speed back to {default_speed} m/s")
-        # speed.set_cruise_speed(vehicle_connection, default_speed)
+        speed.set_cruise_speed(vehicle_connection, default_speed)
     except Exception as e:
         print(f"[Error] Failed to reset cruise speed: {e}")
     finally:
