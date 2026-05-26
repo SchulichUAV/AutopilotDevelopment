@@ -39,21 +39,21 @@ def read_mission_json():
 def drop_distance_json():
     try:
         data = read_mission_json()
-        return data["drop_distance"]
+        return float(data["drop_distance"])
     except Exception as e:
         raise ValueError("Failed to read drop distance")
 
 def drop_height_json():
     try:
         data = read_mission_json()
-        return data["drop_height"]
+        return float(data["drop_height"])
     except Exception as e:
         raise ValueError("Failed to read drop height")
     
 def drop_speed_json():
     try:
         data = read_mission_json()
-        return data["drop_speed"]
+        return float(data["drop_speed"])
     except Exception as e:
         raise ValueError("Failed to read drop speed")
 
