@@ -17,15 +17,16 @@ class suav(mp_module.MPModule):
         self.rel_alt = 0
         self.alt = 0
 
-        self.roll = 0
         self.pitch = 0
         self.yaw = 0
+        self.roll = 0
 
         self.dlat = 0
         self.dlon = 0
         self.dalt = 0
         self.heading = 0
 
+        self.airspeed = 0
         self.groundspeed = 0
         self.throttle = 0
         self.climb = 0
@@ -33,12 +34,8 @@ class suav(mp_module.MPModule):
         self.num_satellites = 0
         self.position_uncertainty = 0
         self.alt_uncertainty = 0
-
-        self.flight_mode = 0
-
-        self.battery_voltage = 0
-        self.battery_current = 0
-        self.battery_remaining = 0
+        self.speed_uncertainty = 0
+        self.heading_uncertainty = 0
 
     def idle_task(self):
         '''called rapidly by mavproxy'''
@@ -49,6 +46,10 @@ class suav(mp_module.MPModule):
             if self.lat != 0:
                 self.send_data()
 
+
+    # since this is not being called anywhere
+    # create a seperate file that you can call this exact function from
+    # then, see what results come out based out of the function call
     def mavlink_packet(self, m):
         '''handle mavlink packets'''
         if self.settings.target_system == 0 or self.settings.target_system == m.get_srcSystem():
@@ -63,39 +64,38 @@ class suav(mp_module.MPModule):
                 self.dlon = dlon # Ground y Speed (Longitude, positive east)
                 self.dalt = dalt # Ground Z speed (Altitude, postive down)
                 self.heading = heading # Vehicle heading, yaw angle
-            
             elif m.get_type() == 'ATTITUDE':
                 (roll, pitch, yaw) = (m.roll, m.pitch, m.yaw)
-                self.roll = roll # Roll in rads (-pi, pi)
-                self.pitch = pitch # Pitch in rads (-pi, pi)
-                self.yaw = yaw # Yaw in rads (-pi, pi)
-                
+                self.roll = roll # Roll (-pi, pi)
+                self.pitch = pitch # Pitch (-pi, pi)
+                self.yaw = yaw # Yaw (-pi, pi)
             elif m.get_type() == 'GPS_RAW_INT':
-                (num_satellites, position_uncertainty, alt_uncertainty) = (m.satellites_visible, m.h_acc, m.v_acc)
+                (num_satellites, position_uncertainty, alt_uncertainty, speed_uncertainty, heading_uncertainty) = (m.satellites_visible, 
+                                                                                                                        m.h_acc, m.v_acc, m.vel_acc, m.hdg_acc)
                 self.num_satellites = num_satellites # Number of visible satellites
                 self.position_uncertainty = position_uncertainty # Position uncertainty (mm)
                 self.alt_uncertainty = alt_uncertainty # Altitude uncertainty (mm)
+                self.speed_uncertainty = speed_uncertainty # Speed uncertainty (mm)
+                self.heading_uncertainty = heading_uncertainty # Heading uncertainty (mm)
 
             elif m.get_type() == 'VFR_HUD':
+                self.airspeed = m.airspeed
+                # get rid of this before PR
+                print("Air Speed defined in 'mavlink_packet':")
+                print(self.airspeed)
                 self.groundspeed = m.groundspeed
                 self.throttle = m.throttle
                 self.climb = m.climb
             
-            elif m.get_type() == 'HEARTBEAT':
-                self.flight_mode = m.custom_mode
-            
-            elif m.get_type() == 'SYS_STATUS':
-                self.battery_voltage = m.voltage_battery
-                self.battery_current = m.current_battery
-                self.battery_remaining = m.battery_remaining
-            
     def send_data(self):
         t = time.time()
-        heartbeat_data = (t, self.lat, self.lon, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
-                self.groundspeed, self.throttle, self.climb, self.num_satellites, self.position_uncertainty, self.alt_uncertainty, self.flight_mode, 
-                self.battery_voltage, self.battery_current, self.battery_remaining)
+        heartbeat_data = (t, self.lon, self.lat, self.rel_alt, self.alt, self.roll, self.pitch, self.yaw, self.dlat, self.dlon, self.dalt, self.heading,
+                self.airspeed, self.groundspeed, self.throttle, self.climb, self.num_satellites, self.position_uncertainty, self.alt_uncertainty, self.speed_uncertainty, 
+                          self.heading_uncertainty, self.flight_mode)
 
         heartbeat_message = f"{heartbeat_data}".encode()
+        print("Heartbeat Message Sent defined in 'send_data':")
+        print(heartbeat_message)
         self.sock.sendto(heartbeat_message, ("127.0.0.1", 5005))
 
     def encode_message(self, items):
@@ -109,3 +109,35 @@ class suav(mp_module.MPModule):
 def init(mpstate):
     '''initialise module'''
     return suav(mpstate)
+
+####### Get Rid of Below Code Later ##########
+# Create a mock message
+class MockMessage:
+    airspeed = 30.0
+    groundspeed = 24.0
+    throttle = 75
+    climb = 2.5
+    
+    def get_type(self):
+        return 'VFR_HUD'
+    
+    def get_srcSystem(self):
+        return 1
+
+# Create mock mpstate
+class MockMPState:
+    class Settings:
+        target_system = 0
+    settings = Settings()
+
+# Now test it properly
+suav_instance = suav(MockMPState())
+suav_instance.flight_mode = "AUTO"  # Set flight_mode to avoid AttributeError
+suav_instance.lat = 37.7749  # Set non-zero lat so send_data will execute
+
+mock_message = MockMessage()
+suav_instance.mavlink_packet(mock_message)
+
+# Now test send_data to see the heartbeat message
+print("\n--- Testing send_data() ---")
+suav_instance.send_data()
