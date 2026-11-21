@@ -1,0 +1,114 @@
+# This file will be the main vtol vehicle file need to update the vtol functions. 
+# copied from Plane/plane.py and still pending modifications/testing for VTOL - Luis Wimmer, nov 2026
+from pymavlink import mavutil
+import sys
+import os
+import json
+
+script_dir = os.path.abspath('./..')
+sys.path.append(script_dir)
+
+import modules.AutopilotDevelopment.General.Operations.arm as vtol_arm
+import modules.AutopilotDevelopment.General.Operations.initialize as vtol_initialize
+import modules.AutopilotDevelopment.General.Operations.mode as vtol_mode
+import modules.AutopilotDevelopment.General.Operations.speed as vtol_speed
+import modules.AutopilotDevelopment.General.Operations.monitor_waypoint as vtol_monitor_waypoint
+import modules.AutopilotDevelopment.General.Operations.mission as mission
+import modules.AutopilotDevelopment.General.Operations.wind as wind
+
+import modules.AutopilotDevelopment.Vtol.Operations.system_state as vtol_system_state
+import modules.AutopilotDevelopment.Vtol.Operations.takeoffVtol as vtol_takeoff_config
+import modules.AutopilotDevelopment.Vtol.Operations.waypointVtol as vtol_waypoint
+
+
+CONFIG_FILE = "./GlobalConfig.json"
+
+class Vtol:
+    def __init__(self):
+        
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+
+        self.vehicle_connection, self.valid_connection = vtol_initialize.connect_to_vehicle(config["vehicle_connection"])
+        self.current_payload_servo = 1
+        self.set_min_speed_param()
+        self.set_max_speed_param()
+        print(f"Connected to vehicle at {config["vehicle_connection"]}")
+
+    def arm_vehicle(self):
+        vtol_arm.arm(self.vehicle_connection)
+
+    def set_flight_mode(self, mode_id):
+        vtol_mode.set_mode(self.vehicle_connection, mode_id)
+
+    def set_speed(self, speed_input):
+        vtol_speed.set_cruise_speed(self.vehicle_connection, speed_input)
+
+    def set_min_speed_param(self):
+        vtol_speed.set_min_speed_param(self.vehicle_connection)
+
+    def set_max_speed_param(self):
+        vtol_speed.set_max_speed_param(self.vehicle_connection)
+
+    def get_waypoint_data(self):
+        vtol_monitor_waypoint.receive_wp(self.vehicle_connection)
+
+    def get_speed_data(self):
+        return vtol_monitor_waypoint.receive_speeds(self.vehicle_connection)
+    
+    def calculate_waypoint_eta(self):
+        return vtol_monitor_waypoint.waypoint_eta(self.vehicle_connection)
+
+    ## system state configurations
+    def get_system_status(self):
+        return vtol_system_state.receive_system_status(self.vehicle_connection)
+    
+    def get_param_value(self, param_id):
+        return vtol_system_state.receive_param_request_read(self.vehicle_connection, param_id)
+    
+    def get_gps_raw(self):
+        return vtol_system_state.receive_gps_raw(self.vehicle_connection)
+    
+    ## from system state, we still need gps status, scaled imu, utm_global_position and wind_cov
+
+    ## takeoff configurations
+    def set_takeoff_altitude(self, height):
+        vtol_takeoff_config.set_takeoff_altitude(self.vehicle_connection, height)
+
+    def set_takeoff_angle(self, pitch):
+        vtol_takeoff_config.set_takeoff_angle(self.vehicle_connection, pitch)
+
+    ## waypoint configurations
+    def add_waypoint(self, latitude, longitude, altitude):
+        vtol_waypoint.set_waypoint(self.vehicle_connection, latitude, longitude, altitude)
+
+    def set_waypoint_radius(self, radius):
+        vtol_waypoint.set_waypoint_radius(self.vehicle_connection, radius)
+
+    def set_loiter_radius(self, loiter_radius):
+        vtol_waypoint.set_waypoint_loiter_radius(self.vehicle_connection, loiter_radius)
+
+    def set_rtl_radius(self, rtl_loiter_radius):
+        vtol_waypoint.set_waypoint_rtl_loiter_radius(self.vehicle_connection, rtl_loiter_radius)
+
+    def start_payload_drop_mission(self):
+        mission.upload_payload_drop_mission(self.vehicle_connection)
+        vtol_mode.set_mode(self.vehicle_connection, 10)
+        mission.check_distance_and_drop(self.vehicle_connection, self.current_payload_servo)
+        self.current_payload_servo += 1
+    
+    def request_and_receive_wind(self):
+        return wind.request_and_receive_wind(self.vehicle_connection)
+
+    def request_motor_angle(self):
+        return vtol_system_state.receive_motor_angle(self.vehicle_connection)
+
+if __name__ == '__main__':
+    ## establish connection to the vtol
+    vtol = VTOL(vehicle_connection='udpin:127.0.0.1:14550') # what do i put here for the connection string?
+
+    ## arm the vehicle
+    vtol.arm_vehicle()
+
+    ## example call
+    vtol.set_speed(15)
