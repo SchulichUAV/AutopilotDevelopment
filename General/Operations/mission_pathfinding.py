@@ -1,4 +1,6 @@
 from typing import Optional
+import modules.AutopilotDevelopment.General.Operations.waypoint_uploader as wu
+import modules.AutopilotDevelopment.General.Operations.initialize as init
 import numpy as np
 import random
 
@@ -7,6 +9,11 @@ ABORT_COST = 10000
 # Conversion Factors: 
 LATITUDE_TO_METERS = 111100
 LONGITUDE_TO_METERS = 92300
+# Temporary constants, replace with live data from GCS when integrating with server.py
+CURRENT_POS = [35.05932, -118.149, 25]
+GEOFENCE = [(35.05932, -118.149), (35.06496, -118.156), (35.06062, -118.163), (35.05932, -118.163)]
+
+
 
 
 def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeading: list, geofence: list):
@@ -21,11 +28,18 @@ def find_best_waypoint_sequence(waypoints: list, currentPos: list, currentHeadin
 
     Returns:
         list: list of list in form [[a,b,c],[x,y,z]...]
+
+    Post processing: 
+        Format must be compatible with waypoint_uploader
+        Convert the list of waypoints into a list of dict, waypoint_list = [{'lat': , 'lon': ,'alt': }, ...].
     """
-
     lowestCost, sequence = find_best_seq(currentPos, [currentPos], waypoints, 0, currentHeading, geofence)
+    waypoint_list = []
+    for waypoint in sequence:
+        waypoint_dict = {'lat': waypoint[0], 'lon': waypoint[1], 'alt': waypoint[2]}
+        waypoint_list.append(waypoint_dict)
 
-    return sequence
+    return waypoint_list
 
 
 def find_best_seq(currentPoint, currentSeq, waypointsLeft, cost, currentHeading, geofence):
@@ -291,3 +305,28 @@ def generate_random_waypoints(borders, geofence):
             newWaypoints.append([wayLat, wayLong, wayAltitude])
             
     return newWaypoints
+
+
+################################## Run Pathfinding algorithm #####################################
+def run_mission_pathfinding(waypoint_list_of_dicts):
+    """ 
+    - Receives Json format [{"lat": ..., "lon": ..., "alt": ...}], and computes the optimal sequence using the pathfinding algorithm, and returns the result ready for upload. 
+    - Remember to set the vehicle connection to the actual connection string, so you can successfully connect to ArduPilot and upload the mission.
+    """
+    all_waypoints = []
+    for waypoint in waypoint_list_of_dicts: 
+        waypoint_coords = [waypoint["lat"], waypoint["lon"], waypoint["alt"]]
+        all_waypoints.append(waypoint_coords)
+    current_heading = calculate_heading(CURRENT_POS, all_waypoints[0], GEOFENCE)
+    return find_best_waypoint_sequence(all_waypoints, CURRENT_POS, current_heading, GEOFENCE)
+
+
+if __name__ == "__main__":
+    print("Connecting to vehicle...")
+    vehicle_connection = init.connect_to_vehicle(r"127.0.0.1:5760")
+    print("Connected!")
+    result = run_mission_pathfinding(test_waypoint_list_of_dicts)
+    print(result)
+    wu.upload_mission_waypoints(vehicle_connection, result)
+
+    print("Mission uploaded successfully!")

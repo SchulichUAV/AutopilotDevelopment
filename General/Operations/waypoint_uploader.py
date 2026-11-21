@@ -1,5 +1,6 @@
 import pymavlink.dialects.v20.all as dialect
 import modules.AutopilotDevelopment.Plane.Operations.waypoint as waypoint
+from modules.AutopilotDevelopment.General.Operations.mission_pathfinding import find_best_waypoint_sequence, calculate_heading, calculate_cost, geofence_vectors, generate_random_waypoints
 
 waypoint_radius = 15
 
